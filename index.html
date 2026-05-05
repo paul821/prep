@@ -3221,6 +3221,10 @@ windows = [[1,4],[4,5]]
             merged.append([start, end])       # no overlap, add new
     return merged</pre>
           <div class="sol-note">The sort step is the key insight — once sorted, you only ever need to compare against the last merged interval. This pattern (sort then walk) appears in many interval problems. Common follow-up: count total hedged time = sum of (end - start) for merged intervals.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">list.sort(key=fn)</code> — <b>Input:</b> optional key function called on each element to produce its sort value. <b>Operation:</b> sorts the list in-place — original is modified, nothing is returned (returns None). <b>Output:</b> None. Use <code style="color:#93c5fd;font-size:0.8rem;">sorted(lst, key=fn)</code> when you need a new sorted list without changing the original.</li>
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">lambda x: expr</code> — An anonymous one-line function. <code style="color:#93c5fd;font-size:0.8rem;">key=lambda x: x[0]</code> means "sort each item by its first element." <b>Input:</b> one argument (each element). <b>Output:</b> the comparison value. Equivalent to writing <code style="color:#93c5fd;font-size:0.8rem;">def f(x): return x[0]</code> but declared inline.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3310,6 +3314,9 @@ second starts: [1]
 # with a sorted structure + bisect, but the problem explicitly
 # allows O(n²) with n ≤ 1000, so the naive scan is fine.</pre>
           <div class="sol-note">Three tiebreaker levels is a common interview complication — implement them in order and test each edge case. The sum(1 for x in arr if x > num) generator expression is idiomatic Python for conditional counting without importing anything.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">sum(1 for x in iterable if condition)</code> — <b>Input:</b> a conditional generator — yields 1 for each x satisfying condition (True == 1, False == 0 in Python). <b>Operation:</b> counts elements meeting the predicate without building a list. <b>Output:</b> integer count. Uses O(1) memory vs <code style="color:#93c5fd;font-size:0.8rem;">len([x for x in arr if cond])</code> which allocates O(n).</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3396,6 +3403,10 @@ def find_duplicates(order_ids):
     counts = Counter(order_ids)
     return [oid for oid, cnt in counts.items() if cnt > 1]</pre>
           <div class="sol-note">Counter is the most useful Python stdlib tool for counting problems. Memorize: Counter(iterable) → dict of {item: count}. Also know .most_common(n) to get top-N items.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">Counter(iterable)</code> — <b>Input:</b> any iterable of hashable elements. <b>Operation:</b> counts occurrences of each element. Missing keys return 0 instead of KeyError. <b>Output:</b> dict subclass; <code style="color:#93c5fd;font-size:0.8rem;">Counter("aabbc")</code> → <code style="color:#93c5fd;font-size:0.8rem;">{'a':2, 'b':2, 'c':1}</code>.</li>
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">Counter.most_common(n)</code> — <b>Input:</b> integer n. <b>Operation:</b> finds the n highest-count elements. <b>Output:</b> list of <code style="color:#93c5fd;font-size:0.8rem;">(element, count)</code> tuples in descending order. Omit n to get all elements sorted by frequency.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3430,6 +3441,10 @@ def group_strategies(strategies):
 # e.g. group [('buy','call',100), ('sell','call',110), ('buy','call',110), ('sell','call',100)]
 # into spreads by normalizing the leg descriptions</pre>
           <div class="sol-note">defaultdict(list) is your go-to for "group items by some key." The trick is finding the right canonical key — sorted characters here, but in trading it might be frozenset of legs, or a normalized tuple.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">defaultdict(factory)</code> — <b>Input:</b> a callable — typically <code style="color:#93c5fd;font-size:0.8rem;">int</code>, <code style="color:#93c5fd;font-size:0.8rem;">list</code>, <code style="color:#93c5fd;font-size:0.8rem;">float</code>, or a lambda. <b>Operation:</b> exactly like a dict, but accessing a missing key calls factory() to create a default and inserts it automatically. <b>Output:</b> dict-like object. <code style="color:#93c5fd;font-size:0.8rem;">defaultdict(int)</code> defaults to 0; <code style="color:#93c5fd;font-size:0.8rem;">defaultdict(list)</code> defaults to [].</li>
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">sorted(iterable, key=None, reverse=False)</code> — <b>Input:</b> any iterable; optional key function; optional reverse flag. <b>Operation:</b> returns a NEW sorted list — the original is unchanged. <b>Output:</b> fresh list. <code style="color:#93c5fd;font-size:0.8rem;">sorted("bca")</code> → <code style="color:#93c5fd;font-size:0.8rem;">['a','b','c']</code>; <code style="color:#93c5fd;font-size:0.8rem;">"".join(sorted("bca"))</code> → <code style="color:#93c5fd;font-size:0.8rem;">"abc"</code>.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3499,6 +3514,9 @@ recording = ['a', 'a', 'a']
 def solution_v2(recording):
     return sum(a.lower() != b.lower() for a, b in zip(recording, recording[1:]))</pre>
           <div class="sol-note">zip(arr, arr[1:]) is the idiomatic Python pattern for "compare every consecutive pair." It avoids indexing entirely. The sum(bool_expr for ...) pattern works because True == 1 and False == 0 in Python — a common interview idiom for counting conditions.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">zip(iter1, iter2, ...)</code> — <b>Input:</b> two or more iterables of any type. <b>Operation:</b> steps through all in lockstep, pairing the i-th element of each. Stops at the shortest — no IndexError. <b>Output:</b> lazy iterator of tuples. <code style="color:#93c5fd;font-size:0.8rem;">zip(arr, arr[1:])</code> pairs every element with its successor — the standard way to examine consecutive pairs without index arithmetic.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3544,6 +3562,9 @@ def searching_challenge(s):
 # handling commas, periods, exclamation marks, etc. without chaining
 # multiple .replace() calls.</pre>
           <div class="sol-note">The metric is count of distinct letters that repeat — not max frequency. Distinguish: "aabbcc" has 3 repeating letters (a, b, c) while "aaab" has 1 repeating letter (a) with max frequency 3. Using Counter and filtering by freq > 1 handles this correctly.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">re.sub(pattern, repl, string)</code> — <b>Input:</b> regex pattern; replacement string; target string. <b>Operation:</b> replaces every substring matching pattern with repl. <code style="color:#93c5fd;font-size:0.8rem;">[^a-zA-Z\s]</code> is a negated character class meaning "any char that is NOT a letter or whitespace" — one pass strips all punctuation. <b>Output:</b> new string; original is unchanged.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3698,6 +3719,10 @@ def rolling_vwap(trades, n):
             results.append(total_value / total_volume)
     return results</pre>
           <div class="sol-note">deque (double-ended queue) is the right tool for sliding windows — O(1) append and popleft. The rolling version maintains running totals instead of recomputing from scratch each time, giving O(n) overall.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">deque(iterable, maxlen=None)</code> — <b>Input:</b> optional iterable to initialize from; optional max-length cap. <b>Operation:</b> double-ended queue. <code style="color:#93c5fd;font-size:0.8rem;">.append(x)</code> and <code style="color:#93c5fd;font-size:0.8rem;">.popleft()</code> are both O(1) — unlike a list where <code style="color:#93c5fd;font-size:0.8rem;">.pop(0)</code> is O(n). If maxlen is set, adding to a full deque drops the opposite end automatically. <b>Output:</b> deque object, iterable and indexable like a list.</li>
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">sum(expr for x in iterable)</code> — <b>Input:</b> a generator expression — evaluated lazily, no intermediate list built. <b>Operation:</b> evaluates expr for each x and sums. <b>Output:</b> single number; zero if iterable is empty. <code style="color:#93c5fd;font-size:0.8rem;">sum(p * v for p, v in trades)</code> computes a dot product in one pass without allocating a list.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3740,6 +3765,10 @@ def match_orders(orders):
                     heapq.heappush(sells, (sell_price, sell_qty - matched))
     return fills</pre>
           <div class="sol-note">heapq gives you a min-heap in Python — perfect for "always match the cheapest sell first." This is the core of a real exchange matching engine. Don't need to know the full implementation, but understand the heap concept and why price-time priority works this way.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">heapq.heappush(heap, item)</code> — <b>Input:</b> a plain Python list used as the heap; item to insert. <b>Operation:</b> inserts item and re-arranges the list to maintain the min-heap property (smallest at index 0). <b>Output:</b> None. Modifies the list in place. O(log n).</li>
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">heapq.heappop(heap)</code> — <b>Input:</b> a list in heap order. <b>Operation:</b> removes and returns the smallest element, then re-heapifies. <b>Output:</b> the minimum element. O(log n). Raises IndexError on empty heap. To peek without removing: <code style="color:#93c5fd;font-size:0.8rem;">heap[0]</code>.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3789,6 +3818,9 @@ def top_3_sort(trades):
     ranked = sorted(day_totals.items(), key=lambda x: -x[1])
     return [[d, v] for d, v in ranked[:3]]</pre>
           <div class="sol-note">heapq.nlargest(k, iterable, key=...) is the correct tool when you only need the top-k from a large dataset — it runs in O(n log k) vs O(n log n) for a full sort. For k=3, this matters at scale. The aggregation step (defaultdict accumulation) is exactly the groupby-sum pattern you'd write in pandas as df.groupby("day")["value"].sum().</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">heapq.nlargest(n, iterable, key=None)</code> — <b>Input:</b> integer n; any iterable; optional key function for ranking. <b>Operation:</b> finds the n largest elements using a size-n min-heap in O(len × log n) — faster than a full sort when n is small. <b>Output:</b> list of n elements in descending order. Mirror: <code style="color:#93c5fd;font-size:0.8rem;">heapq.nsmallest(n, ...)</code>.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3848,6 +3880,10 @@ QUERY → append 75
 #    adds the full position VALUE instead of just the CHANGE in value.
 #    Correct formula: net += delta * current_qty</pre>
           <div class="sol-note">Mark-to-market accounting is how trading desks track P&amp;L intraday: every price move immediately flows through to the book's value. The BUY/SELL operations use the current price at execution time, while CHANGE propagates the price delta across the entire current position. This is a clean test of whether you understand the accounting model, not just the data structures.</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">dict.get(key, default=None)</code> — <b>Input:</b> key; optional default. <b>Operation:</b> returns the value if key exists, otherwise returns default. <b>Output:</b> value or default. The dict is never modified — purely a safe read.</li>
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">dict.setdefault(key, default=None)</code> — <b>Input:</b> key; optional default. <b>Operation:</b> if key exists, returns its value unchanged. If absent, INSERTS key with default and returns it. <b>Output:</b> value at key after the call. Unlike <code style="color:#93c5fd;font-size:0.8rem;">.get()</code>, this writes to the dict — use it to guarantee a key exists before accumulating into it.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -3985,6 +4021,9 @@ def longest_no_repeat_v2(strikes):
         best = max(best, right - left + 1)
     return best</pre>
           <div class="sol-note">v2 (the index-jump version) is slightly faster in practice. The pattern "expand right, shrink left on violation" is the universal two-pointer/sliding-window template — works for many variants of "longest/shortest window satisfying condition X."</div>
+          <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
+            <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">enumerate(iterable, start=0)</code> — <b>Input:</b> any iterable; optional starting index (default 0). <b>Operation:</b> wraps each element with a counter, producing <code style="color:#93c5fd;font-size:0.8rem;">(index, value)</code> pairs on demand — no list is built. <b>Output:</b> lazy iterator of tuples. <code style="color:#93c5fd;font-size:0.8rem;">for i, val in enumerate(arr)</code> replaces <code style="color:#93c5fd;font-size:0.8rem;">for i in range(len(arr)): val = arr[i]</code> — same logic, no manual indexing.</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -4232,99 +4271,6 @@ options = [2, 0, 1]
         <tr><td><strong>deque</strong></td><td>collections</td><td>appendleft, popleft (O(1))</td><td>Sliding windows, BFS queues</td></tr>
         <tr><td><strong>heapq</strong></td><td>heapq</td><td>heappush, heappop (min-heap)</td><td>Always-get-minimum (order book, scheduling)</td></tr>
         <tr><td><strong>list as stack</strong></td><td>built-in</td><td>.append(), .pop() (both O(1))</td><td>Bracket matching, DFS, undo history</td></tr>
-      </tbody>
-    </table>
-
-    <h3 style="margin-top:32px;">Quick Reference — Functions Used in These Problems</h3>
-    <p style="font-size:0.87rem;color:#5a6070;margin-bottom:12px;">Functions that appear in the solutions above but whose mechanics are easy to forget. Each entry: signature → inputs → what it does → output.</p>
-    <table>
-      <thead>
-        <tr style="background:#0f1e3c;">
-          <th style="color:#fff;padding:8px;min-width:200px;">Function</th>
-          <th style="color:#fff;padding:8px;">Inputs</th>
-          <th style="color:#fff;padding:8px;">Operation</th>
-          <th style="color:#fff;padding:8px;">Output</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><code>enumerate(iterable, start=0)</code></td>
-          <td>Any iterable (list, string, …); optional integer start index</td>
-          <td>Wraps each element with a counter. Produces pairs of (index, value) as it iterates — does NOT build a new list in memory.</td>
-          <td>Iterator of <code>(int, item)</code> tuples. Typically unpacked as <code>for i, val in enumerate(arr)</code>.</td>
-        </tr>
-        <tr>
-          <td><code>zip(iter1, iter2, …)</code></td>
-          <td>Two or more iterables of any type</td>
-          <td>Steps through all iterables in lockstep, pairing the i-th element of each. Stops at the shortest iterable.</td>
-          <td>Iterator of tuples. <code>zip([1,2,3], ['a','b','c'])</code> → <code>(1,'a'), (2,'b'), (3,'c')</code>. Common pattern: <code>zip(arr, arr[1:])</code> to get consecutive pairs.</td>
-        </tr>
-        <tr>
-          <td><code>sum(iterable, start=0)</code></td>
-          <td>Iterable of numbers (or a generator expression); optional starting value</td>
-          <td>Adds all elements together, beginning from start. When given a generator like <code>sum(1 for x in arr if cond)</code>, it counts elements satisfying the condition without building an intermediate list.</td>
-          <td>Single number (int or float).</td>
-        </tr>
-        <tr>
-          <td><code>sorted(iterable, key=None, reverse=False)</code></td>
-          <td>Any iterable; optional key function; optional reverse flag</td>
-          <td>Returns a new sorted list — the original is NOT modified (unlike <code>.sort()</code> which is in-place). The key function is called on each element to produce the comparison value: <code>key=lambda x: x[1]</code> sorts by second element.</td>
-          <td>New list in sorted order.</td>
-        </tr>
-        <tr>
-          <td><code>heapq.nlargest(n, iterable, key=None)</code></td>
-          <td>Integer n; any iterable; optional key function</td>
-          <td>Finds the n largest elements without fully sorting. Internally maintains a min-heap of size n, so it runs in O(len × log n) — faster than sort when n is small relative to the list.</td>
-          <td>List of n elements in descending order.</td>
-        </tr>
-        <tr>
-          <td><code>heapq.heappush(heap, item)</code></td>
-          <td>A list (used as the heap); item to insert</td>
-          <td>Inserts item into the heap while preserving the min-heap property (smallest element always at index 0). Modifies the list in place.</td>
-          <td>None. Side effect: heap list is updated.</td>
-        </tr>
-        <tr>
-          <td><code>heapq.heappop(heap)</code></td>
-          <td>A list in heap order</td>
-          <td>Removes and returns the smallest element (index 0), then re-heapifies to restore the min-heap property.</td>
-          <td>The minimum element. Raises IndexError on empty heap.</td>
-        </tr>
-        <tr>
-          <td><code>dict.get(key, default=None)</code></td>
-          <td>Key to look up; optional default value</td>
-          <td>Returns the value for key if it exists. If not, returns default instead of raising KeyError. The dict is never modified.</td>
-          <td>Value (any type) or default.</td>
-        </tr>
-        <tr>
-          <td><code>dict.setdefault(key, default=None)</code></td>
-          <td>Key; optional default value</td>
-          <td>If key already exists, returns its current value (no change). If key is absent, inserts it with the default value AND returns the default. Different from <code>.get()</code>: this one writes to the dict.</td>
-          <td>Value at key after the call.</td>
-        </tr>
-        <tr>
-          <td><code>defaultdict(factory)</code></td>
-          <td>A callable (e.g. <code>int</code>, <code>list</code>, <code>float</code>, or a lambda)</td>
-          <td>Behaves exactly like a dict, but when a missing key is accessed, it calls factory() to create a default value and inserts it automatically. <code>defaultdict(int)</code> → missing keys default to 0. <code>defaultdict(list)</code> → missing keys default to [].</td>
-          <td>A dict-like object. Access <code>d[missing_key]</code> without KeyError.</td>
-        </tr>
-        <tr>
-          <td><code>Counter(iterable)</code></td>
-          <td>Any iterable of hashable elements</td>
-          <td>Counts occurrences of each element. Internally a dict subclass: <code>Counter("aabbc")</code> → <code>{'a':2,'b':2,'c':1}</code>. Supports arithmetic: two Counters can be added or subtracted.</td>
-          <td>Counter object (dict subclass). Key methods: <code>.most_common(n)</code> returns the n highest-count items as [(item, count), …].</td>
-        </tr>
-        <tr>
-          <td><code>re.sub(pattern, repl, string)</code></td>
-          <td>Regex pattern string; replacement string; target string</td>
-          <td>Finds all substrings matching pattern and replaces them with repl. <code>re.sub(r"[^a-zA-Z\s]", "", s)</code> removes every character that is NOT a letter or whitespace — the standard way to strip punctuation before splitting into words.</td>
-          <td>New string with substitutions applied. Original string is not modified.</td>
-        </tr>
-        <tr>
-          <td><code>collections.deque(iterable, maxlen=None)</code></td>
-          <td>Optional iterable to initialize from; optional max length</td>
-          <td>A double-ended queue. <code>.append(x)</code> and <code>.appendleft(x)</code> add to either end in O(1). <code>.pop()</code> and <code>.popleft()</code> remove from either end in O(1). If maxlen is set, new items push out old ones automatically.</td>
-          <td>deque object. Iterable and indexable like a list, but O(1) on both ends instead of O(n) for front operations.</td>
-        </tr>
       </tbody>
     </table>
 
