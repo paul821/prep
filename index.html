@@ -3066,6 +3066,15 @@ prices = [7, 6, 4, 3, 1]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) time, O(1) space</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Initialize <code>min_price = infinity</code> and <code>best_profit = 0</code>.</li>
+              <li>For each price: update <code>min_price = min(min_price, price)</code> — cheapest buy seen so far.</li>
+              <li>Compute profit if selling today: <code>price - min_price</code>. Update <code>best_profit</code> if this beats it.</li>
+              <li>Return <code>best_profit</code>. No two-pass needed — one scan tracks both the best buy and the best sell.</li>
+            </ol>
+          </div>
           <pre>def max_profit(prices):
     min_price = float('inf')
     best_profit = 0
@@ -3095,6 +3104,15 @@ prices = [1, 2, 3, 4, 5]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) time, O(1) space</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Key insight: you can capture every upward day-over-day step, and the sum of all positive steps equals any optimal buy-sell sequence.</li>
+              <li>Iterate through consecutive pairs with <code>range(1, len(prices))</code>.</li>
+              <li>If <code>prices[i] &gt; prices[i-1]</code>, add the difference to profit.</li>
+              <li>Return total profit.</li>
+            </ol>
+          </div>
           <pre>def max_profit_unlimited(prices):
     profit = 0
     for i in range(1, len(prices)):
@@ -3127,6 +3145,15 @@ pnl = [-3, -1, -2]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — Kadane's Algorithm — O(n) time</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Initialize <code>best = current = pnl[0]</code> (handles all-negative input).</li>
+              <li>At each element: <code>current = max(x, current + x)</code> — choose between starting fresh at <code>x</code> or extending the existing streak.</li>
+              <li>Start fresh when <code>current</code> is negative (dragging down). Extend when it is positive (worth keeping).</li>
+              <li>Update <code>best = max(best, current)</code> after each step. Return <code>best</code>.</li>
+            </ol>
+          </div>
           <pre>def max_subarray(pnl):
     best = pnl[0]
     current = pnl[0]
@@ -3169,6 +3196,15 @@ spot = 100.0
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>For each strike, compute <code>pct_diff = abs(strike - spot) / spot</code>.</li>
+              <li>If <code>pct_diff ≤ atm_pct</code> → "ATM" (within threshold, check this first).</li>
+              <li>Elif <code>strike &lt; spot</code> → "ITM" (for a call, strike below spot = in the money).</li>
+              <li>Else → "OTM". Return the list of classifications.</li>
+            </ol>
+          </div>
           <pre>def classify_moneyness(strikes, spot, atm_pct=0.005):
     result = []
     for k in strikes:
@@ -3209,6 +3245,16 @@ windows = [[1,4],[4,5]]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n log n)</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Sort intervals by start time so overlapping windows are adjacent.</li>
+              <li>Seed the result with the first interval.</li>
+              <li>For each subsequent interval: if its start ≤ the end of the last merged interval, they overlap — extend the last merged interval's end to <code>max(last_end, current_end)</code>.</li>
+              <li>If no overlap, append the interval as a new entry.</li>
+              <li>Return the merged list.</li>
+            </ol>
+          </div>
           <pre>def merge_windows(intervals):
     if not intervals:
         return []
@@ -3248,6 +3294,15 @@ scores = [100, 50, 40, 30]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n × days) — days ≤ max(scores)</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Because all updates are simultaneous, work from a copy of the array each day, not the in-progress version.</li>
+              <li>For each interior student (index 1 to n-2): check if both neighbors are strictly higher (+1) or strictly lower (-1). Set a <code>changed</code> flag if any update occurred.</li>
+              <li>After processing all students, replace <code>scores</code> with the copy.</li>
+              <li>If <code>changed</code> is False, the simulation has converged — return the final array.</li>
+            </ol>
+          </div>
           <pre>def final_scores(scores):
     n = len(scores)
     if n <= 2:
@@ -3294,6 +3349,15 @@ second starts: [1]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n²) — intentional per problem constraints</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Seed: <code>first = [numbers[0]]</code>, <code>second = [numbers[1]]</code>.</li>
+              <li>For each subsequent number: count elements strictly greater than it in each array.</li>
+              <li>Route to the array with the higher count. On a tie, route to the shorter array. Still tied → first array.</li>
+              <li>Return <code>first + second</code> concatenated.</li>
+            </ol>
+          </div>
           <pre>def distribute(numbers):
     first  = [numbers[0]]
     second = [numbers[1]]
@@ -3346,6 +3410,15 @@ target = 6
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) time, O(n) space</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Initialize an empty dict <code>seen = {}</code> mapping value → index.</li>
+              <li>For each element, compute <code>complement = target - element</code>.</li>
+              <li>If <code>complement</code> is already in <code>seen</code>, the answer is <code>[seen[complement], current_index]</code> — return immediately.</li>
+              <li>Otherwise store <code>seen[element] = current_index</code> and continue.</li>
+            </ol>
+          </div>
           <pre>def two_sum(pnls, target):
     seen = {}          # value → index
     for i, p in enumerate(pnls):
@@ -3385,6 +3458,14 @@ orders = ['A1', 'B2', 'C3']
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Part 1 (any duplicate?): maintain a <code>seen</code> set. If an element is already in it, return True immediately. Otherwise add it.</li>
+              <li>One-liner alternative: <code>len(ids) != len(set(ids))</code> — set removes duplicates, so size drop = duplicate existed.</li>
+              <li>Part 2 (find all duplicates): use <code>Counter(order_ids)</code> to count occurrences of each ID, then return IDs with count &gt; 1.</li>
+            </ol>
+          </div>
           <pre>def contains_duplicate(order_ids):
     return len(order_ids) != len(set(order_ids))
 
@@ -3428,6 +3509,15 @@ strategies = ["abc", "bca", "xyz", "zyx", "a"]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n·k log k) where k = max string length</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Observation: two strings belong to the same group if and only if, when sorted, they look identical.</li>
+              <li>For each string, compute its "fingerprint": <code>"".join(sorted(s))</code>.</li>
+              <li>Use a <code>defaultdict(list)</code> keyed by fingerprint; append each original string to its group.</li>
+              <li>Return all groups as <code>list(groups.values())</code>.</li>
+            </ol>
+          </div>
           <pre>from collections import defaultdict
 
 def group_strategies(strategies):
@@ -3466,6 +3556,15 @@ strikes = [0, 3, 7, 2, 5, 8, 4, 6, 0, 1]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) time</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Load all values into a set for O(1) membership checks.</li>
+              <li>For each value, only start counting if <code>value - 1</code> is NOT in the set — this is a true sequence start.</li>
+              <li>From each start, extend forward: count while <code>value + length</code> is in the set.</li>
+              <li>Track and return the maximum length seen. Each element is visited at most twice total → O(n).</li>
+            </ol>
+          </div>
           <pre>def longest_consecutive(strikes):
     strike_set = set(strikes)
     best = 0
@@ -3504,6 +3603,14 @@ recording = ['a', 'a', 'a']
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n)</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Normalize: case does not matter, so compare <code>recording[i].lower()</code> with <code>recording[i-1].lower()</code>.</li>
+              <li>Iterate through consecutive pairs (index 1 to end). Count whenever adjacent normalized characters differ.</li>
+              <li>Return the count.</li>
+            </ol>
+          </div>
           <pre>def solution(recording):
     return sum(
         1 for i in range(1, len(recording))
@@ -3542,6 +3649,16 @@ def solution_v2(recording):
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n × w) where w = avg word length</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Strip all non-letter, non-space characters using <code>re.sub(r"[^a-zA-Z\s]", "", s)</code>, then split into words.</li>
+              <li>For each word: use <code>Counter</code> on its lowercase version to count letter frequencies.</li>
+              <li>Compute <code>repeat_count</code> = number of distinct letters with frequency &gt; 1 (letters that appear more than once).</li>
+              <li>Track the word with the highest <code>repeat_count</code>; ties go to the first word encountered (strict greater-than update).</li>
+              <li>Return the best word (lowercased), or -1 if no word has any repeated letter.</li>
+            </ol>
+          </div>
           <pre>import re
 from collections import Counter
 
@@ -3594,6 +3711,15 @@ def searching_challenge(s):
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — The "complete the trading book" pattern</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Use a <code>defaultdict(int)</code> keyed by strike — missing strikes auto-initialize to 0.</li>
+              <li>For each trade: compute <code>delta = +qty</code> if buy, <code>-qty</code> if sell.</li>
+              <li>Accumulate: <code>book[strike] += delta</code>.</li>
+              <li>Filter out flat positions: return only strikes where net qty ≠ 0.</li>
+            </ol>
+          </div>
           <pre>from collections import defaultdict
 
 def net_positions(trades):
@@ -3646,6 +3772,14 @@ spot = 103
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>For each position, determine intrinsic value at expiry: <code>max(spot - strike, 0)</code> for calls, <code>max(strike - spot, 0)</code> for puts.</li>
+              <li>Compute P&amp;L per contract: <code>qty × (intrinsic - premium_paid)</code>. Positive qty = long; negative = short.</li>
+              <li>Sum across all positions. Round to avoid floating-point noise.</li>
+            </ol>
+          </div>
           <pre>def options_pnl(positions, spot):
     total = 0.0
     for pos in positions:
@@ -3695,6 +3829,15 @@ Rolling VWAP (N=2):
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Basic VWAP: <code>sum(price × volume) / sum(volume)</code> — a weighted average where weight is volume.</li>
+              <li>Rolling VWAP: maintain a deque of the last N trades plus running totals of value and volume.</li>
+              <li>Each step: append new trade to deque and add to running totals. If deque exceeds N, pop the oldest trade and subtract its contribution from running totals.</li>
+              <li>Emit VWAP = running_value / running_volume when the window is full. O(n) total.</li>
+            </ol>
+          </div>
           <pre>from collections import deque
 
 def vwap(trades):
@@ -3745,6 +3888,15 @@ def rolling_vwap(trades, n):
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution using heapq (min-heap for sell side)</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Maintain a min-heap of resting sell orders (cheapest sell at the top).</li>
+              <li>For each incoming sell order: push it onto the heap.</li>
+              <li>For each incoming buy order: while remaining qty &gt; 0 and the cheapest sell ≤ buy price, pop from the heap and match.</li>
+              <li>Matched qty = <code>min(remaining_buy_qty, sell_qty)</code>. Record the fill. If sell is partially filled, push the remainder back.</li>
+            </ol>
+          </div>
           <pre>import heapq
 
 def match_orders(orders):
@@ -3795,6 +3947,14 @@ Day 3: 1×10 + 2×8 = 26
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n + k log n) where k=3</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Aggregate: for each <code>[day, volume, price]</code> entry, accumulate <code>volume × price</code> into a <code>defaultdict(float)</code> keyed by day.</li>
+              <li>Rank: use <code>heapq.nlargest(3, day_totals.items(), key=lambda x: x[1])</code> to get the top 3 without a full sort.</li>
+              <li>Return the top 3 as <code>[day, total_value]</code> pairs in descending order.</li>
+            </ol>
+          </div>
           <pre>import heapq
 from collections import defaultdict
 
@@ -3844,6 +4004,16 @@ QUERY → append 75
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) — fixed version of the OA starter code</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Maintain two dicts: <code>stock_price</code> (current mark price per stock) and <code>stock_qty</code> (net shares held).</li>
+              <li>BUY: deduct <code>qty × current_price</code> from net (cash goes out), add qty to holdings.</li>
+              <li>SELL: add <code>qty × current_price</code> to net (cash comes in), subtract qty from holdings.</li>
+              <li>CHANGE: the price moves by delta — every share you hold immediately gains or loses value. Add <code>delta × current_qty</code> to net (mark-to-market). Then update the stored price.</li>
+              <li>QUERY: append the current net to the result list and keep processing — do NOT break.</li>
+            </ol>
+          </div>
           <pre>def get_net_profit(events):
     net = 0
     stock_price = {}   # current mark price per stock
@@ -3910,6 +4080,15 @@ k = 3
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) sliding window</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Compute the sum of the first k elements as the initial window.</li>
+              <li>Slide right: at each step, add the new element and subtract the element leaving the window (<code>vols[i - k]</code>). O(1) per slide.</li>
+              <li>Track the maximum window sum seen.</li>
+              <li>Return <code>max_sum / k</code> for the final average.</li>
+            </ol>
+          </div>
           <pre>def max_avg_window(vols, k):
     window_sum = sum(vols[:k])   # initial window
     best_sum = window_sum
@@ -3951,6 +4130,15 @@ n = 3
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — connects directly to Tuesday's lecture</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Compute log returns: <code>log(prices[i] / prices[i-1])</code> for each consecutive pair — this gives the daily percentage moves in log scale.</li>
+              <li>For each N-element window of log returns: compute the sample standard deviation (divide by N-1).</li>
+              <li>Annualize: <code>std_dev × sqrt(252)</code>. This converts daily vol to annual vol using the square-root-of-time rule.</li>
+              <li>Collect one result per window starting from day N.</li>
+            </ol>
+          </div>
           <pre>import math
 
 def rolling_realized_vol(prices, n, trading_days=252):
@@ -3998,6 +4186,15 @@ strikes = [100, 100, 100]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) sliding window with set</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Maintain a <code>seen</code> set of values in the current window, plus a left pointer.</li>
+              <li>Expand right: if the new element is already in <code>seen</code>, shrink from the left (removing elements from the set) until the duplicate is gone.</li>
+              <li>Add the new element to <code>seen</code>. Update <code>best = max(best, right - left + 1)</code>.</li>
+              <li>v2 optimization: store index in a dict to jump left pointer directly past the duplicate instead of stepping one at a time.</li>
+            </ol>
+          </div>
           <pre>def longest_no_repeat(strikes):
     seen = set()
     left = 0
@@ -4052,6 +4249,16 @@ k=3, best window with 3 unique chars → "aabcadcbac" or sub of it
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) sliding window, O(k) space</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Parse: the first character is k (max unique chars). Remove it; search the remaining string.</li>
+              <li>Maintain a frequency dict for the current window and a <code>unique</code> counter.</li>
+              <li>Expand right: add the new char to freq. If it is new, increment <code>unique</code>.</li>
+              <li>If <code>unique &gt; k</code>: shrink from the left — decrement freq; if freq hits 0, delete the entry and decrement <code>unique</code>. Repeat until <code>unique == k</code>.</li>
+              <li>When <code>unique == k</code>: compare the current window length to <code>best</code>. Update only on strictly greater length (preserves the first-longest on ties).</li>
+            </ol>
+          </div>
           <pre>def searching_challenge(str_param):
     if not str_param or not str_param[0].isdigit():
         return ""
@@ -4121,6 +4328,16 @@ pnls = [0, 0, 0]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n²) — optimal for this problem</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Sort the array — this enables the two-pointer technique and makes duplicate skipping easy.</li>
+              <li>Fix the first element at index i. The problem reduces to: find two elements in the remainder summing to <code>-pnls[i]</code>.</li>
+              <li>Use left/right pointers starting at i+1 and end. If sum &lt; 0, advance left; if &gt; 0, retreat right; if == 0, record triplet.</li>
+              <li>After recording, skip duplicates: advance left while <code>pnls[left]</code> hasn't changed; same for right.</li>
+              <li>Skip duplicate values of i at the outer loop too.</li>
+            </ol>
+          </div>
           <pre>def three_sum(pnls):
     pnls.sort()
     result = []
@@ -4161,6 +4378,15 @@ log = "((("      → False  (unclosed)</div>
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) with stack</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Build a <code>matching</code> dict mapping each closer to its expected opener: <code>{')': '(', ']': '[', ...}</code>.</li>
+              <li>For each character: if it is an opener, push it onto the stack.</li>
+              <li>If it is a closer: if the stack is empty or the top does not match the expected opener, return False. Otherwise pop.</li>
+              <li>After scanning: return <code>len(stack) == 0</code> — all opened brackets must have been closed.</li>
+            </ol>
+          </div>
           <pre>def is_valid(log):
     stack = []
     matching = {')': '(', ']': '[', '}': '{', '>': '<'}
@@ -4195,6 +4421,15 @@ depths = [4,2,0,3,2,5]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — O(n) two-pointer, O(1) space</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Water at any position = <code>min(max_to_left, max_to_right) - height</code> (if positive).</li>
+              <li>Two pointers from each end. At each step, process the shorter side — its max is already the binding constraint since the other side is guaranteed to be ≥ it.</li>
+              <li>If the current height ≥ the tracked max for that side, update the max. Otherwise, add <code>max - height</code> to water.</li>
+              <li>Move the processed pointer inward. Stop when pointers meet.</li>
+            </ol>
+          </div>
           <pre>def trap(depths):
     left, right = 0, len(depths) - 1
     left_max = right_max = 0
@@ -4239,6 +4474,16 @@ options = [2, 0, 1]
         <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
         <div class="solution">
           <div class="sol-label">Solution — Dutch National Flag Algorithm</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+            <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+              <li>Three pointers: <code>low</code> (right boundary of 0-region), <code>mid</code> (current), <code>high</code> (left boundary of 2-region).</li>
+              <li>If <code>options[mid] == 0</code>: swap with <code>options[low]</code>, advance both <code>low</code> and <code>mid</code>.</li>
+              <li>If <code>options[mid] == 1</code>: already in place, advance <code>mid</code> only.</li>
+              <li>If <code>options[mid] == 2</code>: swap with <code>options[high]</code>, retreat <code>high</code> only — do NOT advance <code>mid</code> because the swapped-in value is unknown and needs re-evaluation.</li>
+              <li>Stop when <code>mid &gt; high</code>.</li>
+            </ol>
+          </div>
           <pre>def sort_moneyness(options):
     low = 0
     mid = 0
@@ -4290,20 +4535,330 @@ options = [2, 0, 1]
 
     <div class="py-card">
       <h4>⑧ Completing Partial Functions — Round 2 Strategy</h4>
-      <p style="font-size:0.88rem;margin:6px 0;"><strong>Step 1:</strong> Read the function name + docstring — the intent is always clear. <strong>Step 2:</strong> Identify the pattern (dict accumulation? sliding window? sort + scan?). <strong>Step 3:</strong> Write simplest correct solution. Then handle edge cases: empty list, single element.</p>
-      <pre># Example: complete net_delta()
-def net_delta(trades, deltas_by_strike):
+      <p style="font-size:0.88rem;margin:6px 0 14px;"><strong>Step 1:</strong> Read the function name and docstring — the intent is always clear. <strong>Step 2:</strong> Identify the pattern (dict accumulation? sliding window? sort + scan?). <strong>Step 3:</strong> Write the simplest correct solution first, then handle edge cases. These problems reward reading carefully over coding fast.</p>
+
+      <!-- CPF1 -->
+      <div class="prob" style="margin-bottom:14px;">
+        <div class="prob-header">
+          <div class="prob-meta"><span class="prob-num">CPF1</span><span class="pill orange">Medium</span><span class="prob-lc">OA — Understand &amp; Extend</span></div>
+          <div class="prob-title">superDigit — What Does This Do, and When Does It Stop?</div>
+        </div>
+        <div class="prob-body">
+          <p class="prob-desc">Given the function below, answer: (a) what does it compute? (b) why is the <code>while True</code> loop guaranteed to terminate? (c) complete the memoized wrapper so repeated queries are O(1).</p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-size:0.82rem;margin:10px 0;">def superDigit(n, k):
+    p = sum(list(map(int, n))) * k
+    while True:
+        if len(str(p)) == 1:
+            return p
+        p = sum(list(map(int, str(p))))</pre>
+          <div class="prob-hint">💡 Hint: Trace <code>superDigit("148", 3)</code> by hand. Each pass through the loop reduces the number of digits. What is the maximum value of a single-digit number?</div>
+          <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+          <div class="solution">
+            <div class="sol-label">Explanation + Memoized Extension</div>
+            <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+              <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+              <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+                <li>First pass: digit-sum the string <code>n</code>, multiply by k. This is the digit sum of the full concatenation <code>n</code> repeated k times, without actually building it.</li>
+                <li>Iterate: replace the number with its digit sum until it is a single digit.</li>
+                <li>Termination proof: every digit sum strictly reduces the number (unless already single-digit). A number with d digits has value ≤ 9d, but its digit sum ≤ 9d too — so the number of digits decreases each iteration.</li>
+                <li>For memoization: the while-loop portion is a pure function of the integer p. Cache it with a dict.</li>
+              </ol>
+            </div>
+            <pre>def superDigit(n, k):
+    # Step 1: digit-sum of n * k, without building the full string
+    p = sum(int(c) for c in n) * k
+    # Step 2: reduce to single digit
+    while len(str(p)) > 1:
+        p = sum(int(c) for c in str(p))
+    return p
+
+# --- Memoized wrapper for repeated queries ---
+_cache = {}
+
+def superDigit_memo(n, k):
+    key = (n, k)
+    if key not in _cache:
+        _cache[key] = superDigit(n, k)
+    return _cache[key]
+
+# Trace: superDigit("148", 3)
+# p = (1+4+8) * 3 = 39
+# 39 → 3+9 = 12
+# 12 → 1+2 = 3   ← single digit, return 3</pre>
+            <div class="sol-note">The original code uses <code>sum(list(map(int, str(p))))</code> — correct but verbose. <code>sum(int(c) for c in str(p))</code> is the idiomatic Python form. The key insight interviewers test: why is this O(log log n) per call? Each iteration, the number of digits drops dramatically — a 1000-digit number has digit sum ≤ 9000, which has at most 4 digits.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CPF2 -->
+      <div class="prob" style="margin-bottom:14px;">
+        <div class="prob-header">
+          <div class="prob-meta"><span class="prob-num">CPF2</span><span class="pill red">Hard</span><span class="prob-lc">OA — Debug</span></div>
+          <div class="prob-title">minimumBribes — Find and Fix All Bugs</div>
+        </div>
+        <div class="prob-body">
+          <p class="prob-desc">The function below is supposed to count the minimum number of bribes needed to produce a given queue permutation, or print "Too chaotic" if any person moved more than 2 spots forward. It produces no output and gives wrong answers. Find every bug and write the correct version. The input <code>q</code> is a 1-indexed permutation.</p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-size:0.82rem;margin:10px 0;">def minimumBribes(q):
+    num = 0
+    for i in range(n-1):
+        if q[i]-i&gt;3:
+            return "Too chaotic"
+        num += abs(q[i]-(i+1))
+    return num</pre>
+          <div class="prob-hint">💡 Hint: There are 4 distinct bugs. Work through them one at a time: (1) what is <code>n</code>? (2) what is the correct "too chaotic" threshold for a 1-indexed queue? (3) is <code>abs(q[i]-(i+1))</code> the right bribe count formula? (4) how does the caller see the result?</div>
+          <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+          <div class="solution">
+            <div class="sol-label">4 bugs identified and fixed</div>
+            <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+              <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Bugs, in order</div>
+              <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+                <li><strong>Bug 1 — <code>n</code> undefined:</strong> should be <code>len(q)</code>. Also <code>range(n-1)</code> misses the last person — use <code>range(len(q))</code>.</li>
+                <li><strong>Bug 2 — wrong chaotic check:</strong> <code>q[i]-i &gt; 3</code> should be <code>q[i]-(i+1) &gt; 2</code>. Person at 0-indexed position i has 1-indexed position i+1. If their original number <code>q[i]</code> exceeds their current position by more than 2, they bribed too many people.</li>
+                <li><strong>Bug 3 — wrong bribe count:</strong> <code>abs(q[i]-(i+1))</code> counts displacement, not bribes. Bribes received by person at position i = number of people ahead of them with a higher original number. The O(n²) formula: for each i, count j &lt; i where <code>q[j] &gt; q[i]</code>. The O(n) shortcut: only check from <code>max(q[i]-2, 1)-1</code> to <code>i</code> (a person can only bribe 2 positions forward).</li>
+                <li><strong>Bug 4 — no output:</strong> the function returns a string or int but nothing prints it. Add <code>print(...)</code> inside the function, or call <code>print(minimumBribes(q))</code>.</li>
+              </ol>
+            </div>
+            <pre>def minimumBribes(q):
+    bribes = 0
+    n = len(q)
+    for i in range(n):
+        # Bug 2 fixed: 1-indexed position is i+1; max forward move is 2
+        if q[i] - (i + 1) &gt; 2:
+            print("Too chaotic")
+            return
+        # Bug 3 fixed: count people ahead with higher original number
+        # Only need to check from max(q[i]-2, 1) since no one moves back more
+        for j in range(max(q[i] - 2, 1) - 1, i):
+            if q[j] &gt; q[i]:
+                bribes += 1
+    print(bribes)   # Bug 4 fixed: print, not return</pre>
+            <div class="sol-note">The O(n) range trick <code>max(q[i]-2, 1)-1</code> is the key insight: a person at original position k can only bribe 2 people, so they can only be blocked by people starting at positions k-1 and k-2. Anyone else ahead of them got there legitimately. This reduces the inner loop from O(n) to O(1) per person.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CPF3 -->
+      <div class="prob" style="margin-bottom:14px;">
+        <div class="prob-header">
+          <div class="prob-meta"><span class="prob-num">CPF3</span><span class="pill orange">Medium</span><span class="prob-lc">OA — Fix Logic</span></div>
+          <div class="prob-title">finalInstances — Fix the Auto-Scaling Loop</div>
+        </div>
+        <div class="prob-body">
+          <p class="prob-desc">This function is supposed to simulate auto-scaling: if average utilization is below 25%, halve the instance count (ceiling division); if above 60%, double it. After either scaling event, skip the next 9 readings (a cooldown). The code is structurally wrong. Fix it so the cooldown actually works.</p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-size:0.82rem;margin:10px 0;">def finalinstances(instances, averageUtil):
+    n = len(averageUtil)
+    for i in range(n):
+        if averageUtil[i] &lt; 25:
+            if instances &gt; 1:
+                instances = (instances+1)//2
+            i += 9                     # BUG: does nothing in a for loop
+        elif averageUtil[i] &gt; 60:
+            if instances &lt;= 10**8:
+                instances *= 2
+            i += 9                     # BUG: does nothing in a for loop
+    return instances</pre>
+          <div class="prob-hint">💡 Hint: In Python, modifying the loop variable inside a <code>for</code> loop has no effect on iteration — <code>for i in range(n)</code> always increments i by 1 regardless. To skip indices, use a <code>while</code> loop and control <code>i</code> manually.</div>
+          <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+          <div class="solution">
+            <div class="sol-label">Fixed version — while loop with manual index control</div>
+            <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+              <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+              <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+                <li>Switch from <code>for i in range(n)</code> to <code>while i &lt; n</code> so incrementing <code>i</code> inside the loop body actually takes effect.</li>
+                <li>After a scaling event, set <code>i += 10</code> (skip the triggered reading + 9 cooldown readings). Without a scaling event, set <code>i += 1</code> normally.</li>
+                <li>The instance cap check (<code>&lt;= 10**8</code>) and floor check (<code>&gt; 1</code>) stay the same.</li>
+              </ol>
+            </div>
+            <pre>import math
+
+def finalinstances(instances, averageUtil):
+    i = 0
+    n = len(averageUtil)
+    while i &lt; n:
+        if averageUtil[i] &lt; 25:
+            if instances &gt; 1:
+                instances = math.ceil(instances / 2)
+            i += 10   # current reading + 9 cooldown
+        elif averageUtil[i] &gt; 60:
+            if instances &lt;= 10**8:
+                instances *= 2
+            i += 10   # current reading + 9 cooldown
+        else:
+            i += 1    # no scaling, advance normally
+    return instances
+
+# Note: (instances+1)//2 == math.ceil(instances/2) — both correct.
+# math.ceil is more readable for "halve, rounding up."</pre>
+            <div class="sol-note">This is a classic Python gotcha: <code>for i in range(n): i += 9</code> does absolutely nothing to the iteration — Python regenerates <code>i</code> from the range object at the top of every loop regardless of what you did to it. The fix is always: if you need to skip iterations, use <code>while</code> and control the index yourself. Interviewers test this pattern deliberately.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CPF4 -->
+      <div class="prob" style="margin-bottom:14px;">
+        <div class="prob-header">
+          <div class="prob-meta"><span class="prob-num">CPF4</span><span class="pill orange">Medium</span><span class="prob-lc">New — Complete the Function</span></div>
+          <div class="prob-title">Complete: position_delta_exposure</div>
+        </div>
+        <div class="prob-body">
+          <p class="prob-desc">The trading desk tracks each option position and its per-contract delta. Complete the function to compute the total portfolio delta and identify the top 3 strikes by absolute delta contribution.</p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-size:0.82rem;margin:10px 0;">def position_delta_exposure(positions, deltas):
     """
-    trades: [{"strike": K, "qty": Q, "side": "buy"/"sell"}]
-    deltas_by_strike: {K: delta_value}
-    Returns total portfolio delta.
+    positions: list of {"strike": int, "qty": int, "side": "buy"/"sell"}
+    deltas:    dict of {strike: delta_per_contract}  (calls positive, puts negative)
+    Returns:
+        total_delta: float — net portfolio delta
+        top3:        list of (strike, contribution) sorted by abs(contribution) desc
     """
-    total = 0
-    for trade in trades:
-        signed_qty = trade["qty"] if trade["side"] == "buy" else -trade["qty"]
-        delta = deltas_by_strike.get(trade["strike"], 0)
-        total += signed_qty * delta
-    return total</pre>
+    # YOUR CODE HERE
+    pass</pre>
+          <div class="prob-hint">💡 Hint: signed qty = +qty for buy, -qty for sell. Contribution per strike = signed_qty × delta. Aggregate by strike, then use heapq or sorted to get top 3 by absolute value.</div>
+          <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+          <div class="solution">
+            <div class="sol-label">Solution</div>
+            <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+              <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+              <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+                <li>For each position, compute signed qty (positive = long, negative = short).</li>
+                <li>Multiply signed qty by the per-contract delta to get this position's delta contribution. Accumulate by strike using a defaultdict.</li>
+                <li>Sum all per-strike contributions for total delta.</li>
+                <li>Sort strike contributions by absolute value descending; take the top 3.</li>
+              </ol>
+            </div>
+            <pre>import heapq
+from collections import defaultdict
+
+def position_delta_exposure(positions, deltas):
+    per_strike = defaultdict(float)
+    for pos in positions:
+        signed_qty = pos["qty"] if pos["side"] == "buy" else -pos["qty"]
+        delta      = deltas.get(pos["strike"], 0)
+        per_strike[pos["strike"]] += signed_qty * delta
+
+    total_delta = sum(per_strike.values())
+
+    top3 = heapq.nlargest(
+        3,
+        per_strike.items(),
+        key=lambda x: abs(x[1])   # rank by absolute contribution
+    )
+    return total_delta, top3</pre>
+            <div class="sol-note">This is almost exactly the <code>net_delta</code> example from the section intro, extended with a top-3 ranking step. In an interview, if you see a docstring that says "returns X and Y," write both return values and make sure your variable names match the docstring terminology — interviewers read docstrings carefully when evaluating.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CPF5 -->
+      <div class="prob" style="margin-bottom:14px;">
+        <div class="prob-header">
+          <div class="prob-meta"><span class="prob-num">CPF5</span><span class="pill orange">Medium</span><span class="prob-lc">New — Complete the Function</span></div>
+          <div class="prob-title">Complete: build_vol_surface</div>
+        </div>
+        <div class="prob-body">
+          <p class="prob-desc">Given a list of option quote records, complete the function to build a nested vol surface: a dict mapping expiration → strike → implied_vol. If multiple quotes exist for the same (expiry, strike), use the one with the tighter bid-ask spread (lower spread = better quality quote).</p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-size:0.82rem;margin:10px 0;">def build_vol_surface(quotes):
+    """
+    quotes: list of {"expiry": str, "strike": float,
+                     "bid_iv": float, "ask_iv": float}
+    Returns: dict of {expiry: {strike: mid_iv}}
+    Uses the quote with tightest spread if duplicates exist.
+    """
+    surface = {}
+    best_spread = {}   # (expiry, strike) -> tightest spread seen so far
+    # YOUR CODE HERE
+    return surface</pre>
+          <div class="prob-hint">💡 Hint: The key is <code>(expiry, strike)</code>. Track the tightest spread seen per key in <code>best_spread</code>. Only update <code>surface</code> when the current quote has a tighter spread than the stored one.</div>
+          <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+          <div class="solution">
+            <div class="sol-label">Solution</div>
+            <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+              <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+              <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+                <li>For each quote, compute spread = ask_iv - bid_iv and mid_iv = (bid_iv + ask_iv) / 2.</li>
+                <li>Form the composite key <code>(expiry, strike)</code>.</li>
+                <li>If this key is new, or this quote's spread is tighter than the stored one: update <code>best_spread</code> and write mid_iv into <code>surface[expiry][strike]</code>.</li>
+                <li>Initialize nested dicts lazily with <code>surface.setdefault(expiry, {})</code>.</li>
+              </ol>
+            </div>
+            <pre>def build_vol_surface(quotes):
+    surface     = {}
+    best_spread = {}   # (expiry, strike) -> tightest spread seen
+
+    for q in quotes:
+        expiry = q["expiry"]
+        strike = q["strike"]
+        spread = q["ask_iv"] - q["bid_iv"]
+        mid_iv = (q["bid_iv"] + q["ask_iv"]) / 2
+        key    = (expiry, strike)
+
+        if key not in best_spread or spread &lt; best_spread[key]:
+            best_spread[key] = spread
+            surface.setdefault(expiry, {})[strike] = mid_iv
+
+    return surface</pre>
+            <div class="sol-note"><code>dict.setdefault(expiry, {})</code> is the right tool here — it inserts an empty dict if the expiry key is absent, then returns it so you can chain <code>[strike] = mid_iv</code> on the same line. The alternative (<code>defaultdict(dict)</code>) also works but requires an import and is overkill for a function that already constructs the outer dict manually.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CPF6 -->
+      <div class="prob">
+        <div class="prob-header">
+          <div class="prob-meta"><span class="prob-num">CPF6</span><span class="pill orange">Medium</span><span class="prob-lc">New — Complete the Function</span></div>
+          <div class="prob-title">Complete: reconcile_trades</div>
+        </div>
+        <div class="prob-body">
+          <p class="prob-desc">Two trading systems each recorded the day's trades independently. Complete the function to reconcile them: return three lists — trades only in system A, trades only in system B, and trades that appear in both (matched). A trade is uniquely identified by its <code>(ticker, qty, price)</code> tuple. Each trade can appear multiple times (multiple fills at the same price).</p>
+          <pre style="background:#1e293b;color:#e2e8f0;padding:12px;border-radius:6px;font-size:0.82rem;margin:10px 0;">def reconcile_trades(trades_a, trades_b):
+    """
+    trades_a, trades_b: lists of {"ticker": str, "qty": int, "price": float}
+    Returns: (only_in_a, only_in_b, matched)
+    Duplicate trades (same ticker/qty/price) are matched one-for-one.
+    """
+    # YOUR CODE HERE
+    pass</pre>
+          <div class="prob-hint">💡 Hint: Use a Counter keyed by (ticker, qty, price). Subtract to find differences. The overlap between two Counters gives the matched trades.</div>
+          <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+          <div class="solution">
+            <div class="sol-label">Solution — Counter arithmetic</div>
+            <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+              <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Approach</div>
+              <ol style="margin:0;padding-left:20px;color:rgba(255,255,255,0.78);font-size:0.83rem;line-height:1.78;">
+                <li>Convert each list to a Counter keyed by <code>(ticker, qty, price)</code> — this handles duplicates correctly by counting each occurrence.</li>
+                <li>Matched = intersection of the two Counters (<code>counter_a &amp; counter_b</code>).</li>
+                <li>Only in A = Counter A minus matched counts (<code>counter_a - counter_b</code>). Only in B = Counter B minus Counter A.</li>
+                <li>Expand each Counter back to a flat list (repeat each key by its count).</li>
+              </ol>
+            </div>
+            <pre>from collections import Counter
+
+def reconcile_trades(trades_a, trades_b):
+    def to_counter(trades):
+        return Counter(
+            (t["ticker"], t["qty"], t["price"]) for t in trades
+        )
+
+    ca = to_counter(trades_a)
+    cb = to_counter(trades_b)
+
+    matched_counts = ca &amp; cb           # min count per key
+    only_a_counts  = ca - cb           # in A but not fully covered by B
+    only_b_counts  = cb - ca
+
+    def expand(counter):
+        return [{"ticker": t, "qty": q, "price": p}
+                for (t, q, p), cnt in counter.items()
+                for _ in range(cnt)]
+
+    return expand(only_a_counts), expand(only_b_counts), expand(matched_counts)
+
+# Counter arithmetic:
+# Counter({"x":3}) - Counter({"x":1}) = Counter({"x":2})  — subtraction floors at 0
+# Counter({"x":3}) & Counter({"x":1}) = Counter({"x":1})  — intersection = min count</pre>
+            <div class="sol-note">Counter subtraction (<code>a - b</code>) floors at zero and drops negatives — it does NOT produce negative counts, which makes it exactly right for "how many are in A but unmatched." The intersection (<code>a &amp; b</code>) takes the minimum count per key, correctly matching duplicate fills one-for-one. This is the trading operations reconciliation problem in miniature — real desk reconciliation uses exactly this logic.</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <details style="margin:18px 0;border:1px solid #e0e4ef;border-radius:10px;overflow:hidden;">
