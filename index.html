@@ -3084,6 +3084,17 @@ prices = [7, 6, 4, 3, 1]
     return best_profit</pre>
           <div class="sol-note">This is the single most commonly tested trading interview problem. Know it cold. The key insight: you don't need to find both days — just track the best "buy" seen so far and compare each "sell" against it.</div>
         </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">NumPy — vectorized O(n)</div>
+          <pre>import numpy as np
+
+def max_profit_np(prices):
+    a = np.array(prices, dtype=float)
+    running_min = np.minimum.accumulate(a)   # cheapest buy up to each day
+    return float(np.max(a - running_min))    # best profit if selling today</pre>
+          <div class="sol-note"><code>np.minimum.accumulate(a)</code> walks left-to-right keeping the smallest value seen so far at each position — the vectorized equivalent of the manual <code>min_price</code> tracker. Subtracting gives all possible profits simultaneously; <code>np.max</code> picks the best.</div>
+        </div>
       </div>
     </div>
 
@@ -3124,6 +3135,16 @@ prices = [1, 2, 3, 4, 5]
 # Capturing every up-day is equivalent to any optimal buy/sell sequence.
 # [1,3,5] → take (3-1)+(5-3) = 4 = same as (5-1) = 4 ✓</pre>
           <div class="sol-note">The "sum all positive differences" trick is non-obvious but elegant. In a trading interview, showing you can derive it from first principles (not just memorize) is impressive.</div>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">NumPy — one-liner</div>
+          <pre>import numpy as np
+
+def max_profit_unlimited_np(prices):
+    gains = np.diff(prices)               # prices[1:] - prices[:-1]
+    return float(gains[gains > 0].sum())  # sum only upward days</pre>
+          <div class="sol-note"><code>np.diff(arr)</code> computes all consecutive differences in one call. Boolean indexing <code>gains[gains > 0]</code> filters to upward days. Both operations are vectorized — no Python loop needed.</div>
         </div>
       </div>
     </div>
@@ -3176,6 +3197,19 @@ def max_subarray_with_indices(pnl):
     return best, best_start, end</pre>
           <div class="sol-note">Kadane's is a must-know. The core decision at each step: "Is starting fresh here better than dragging along a negative running sum?" Common follow-up: return the actual subarray, not just the sum.</div>
         </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">NumPy — cumsum trick</div>
+          <pre>import numpy as np
+
+def max_subarray_np(pnl):
+    cs = np.cumsum(pnl)
+    # sum(pnl[i:j]) == cs[j] - cs[i-1]
+    # maximize over j: cs[j] - min(cs[0..j-1])
+    running_min = np.minimum.accumulate(np.concatenate([[0], cs[:-1]]))
+    return float(np.max(cs - running_min))</pre>
+          <div class="sol-note">The identity <code>sum(pnl[i:j]) = cs[j] - cs[i]</code> reduces the problem to: find max of <code>cs[j] - (running min before j)</code>. Prepending 0 lets the subarray start at index 0. Same logic as Kadane's, expressed as array math.</div>
+        </div>
       </div>
     </div>
 
@@ -3224,6 +3258,21 @@ def classify_moneyness_v2(strikes, spot, atm_pct=0.005):
         return 'ITM' if k < spot else 'OTM'
     return [moneyness(k) for k in strikes]</pre>
           <div class="sol-note">Simple but tests whether you: (1) use percentage not absolute distance, (2) know that for calls ITM means strike < spot. A follow-up might ask you to do it for puts (inverted: strike > spot = ITM for put).</div>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">NumPy — np.select for multi-condition classification</div>
+          <pre>import numpy as np
+
+def classify_moneyness_np(strikes, spot, atm_pct=0.005):
+    strikes  = np.array(strikes, dtype=float)
+    pct_diff = np.abs(strikes - spot) / spot
+    return np.select(
+        condlist   = [pct_diff <= atm_pct, strikes < spot],
+        choicelist = ['ATM',               'ITM'],
+        default    = 'OTM'
+    ).tolist()</pre>
+          <div class="sol-note"><code>np.select(condlist, choicelist, default)</code> is the vectorized if/elif/else chain. Conditions are evaluated in order; the first True condition wins for each element. Much faster than a loop when classifying large strike chains.</div>
         </div>
       </div>
     </div>
@@ -3326,6 +3375,26 @@ scores = [100, 50, 40, 30]
 # would see the already-updated value, giving wrong results.
 # The copy makes Day N decisions based entirely on Day N-1 state.</pre>
           <div class="sol-note">The critical insight is "simultaneous" — always work from a snapshot. This pattern appears any time updates depend on neighbors: Conway's Game of Life, heat diffusion, any cellular automaton. The convergence proof: each day, scores move toward their neighbors, so they stabilize within max(scores) days.</div>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">NumPy — vectorized simultaneous update</div>
+          <pre>import numpy as np
+
+def final_scores_np(scores):
+    a = np.array(scores, dtype=float)
+    while True:
+        left, mid, right = a[:-2], a[1:-1], a[2:]
+        delta = np.zeros(len(a))
+        delta[1:-1] = np.where(
+            (left > mid) & (right > mid),   1,
+            np.where(
+            (left < mid) & (right < mid),  -1, 0)
+        )
+        if not delta.any():
+            return a.astype(int).tolist()
+        a += delta</pre>
+          <div class="sol-note">Array slicing creates three aligned views of the array representing left-neighbor, current, and right-neighbor for every interior position at once. The nested <code>np.where</code> applies the update rule to all students simultaneously — no inner Python loop.</div>
         </div>
       </div>
     </div>
@@ -3488,6 +3557,20 @@ def find_duplicates(order_ids):
             <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">Counter(iterable)</code> — <b>Input:</b> any iterable of hashable elements. <b>Operation:</b> counts occurrences of each element. Missing keys return 0 instead of KeyError. <b>Output:</b> dict subclass; <code style="color:#93c5fd;font-size:0.8rem;">Counter("aabbc")</code> → <code style="color:#93c5fd;font-size:0.8rem;">{'a':2, 'b':2, 'c':1}</code>.</li>
             <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">Counter.most_common(n)</code> — <b>Input:</b> integer n. <b>Operation:</b> finds the n highest-count elements. <b>Output:</b> list of <code style="color:#93c5fd;font-size:0.8rem;">(element, count)</code> tuples in descending order. Omit n to get all elements sorted by frequency.</li>
           </ul>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas — Series.duplicated()</div>
+          <pre>import pandas as pd
+
+def contains_duplicate_pd(order_ids):
+    return pd.Series(order_ids).duplicated().any()
+
+def find_duplicates_pd(order_ids):
+    s = pd.Series(order_ids)
+    # keep=False marks ALL copies of a duplicate as True (not just the 2nd)
+    return s[s.duplicated(keep=False)].unique().tolist()</pre>
+          <div class="sol-note"><code>Series.duplicated(keep=False)</code> marks every occurrence of a repeated value as True. <code>.unique()</code> collapses them so each duplicate ID appears once in the result. In practice, this is how you'd audit a trade blotter for duplicate order entries.</div>
         </div>
       </div>
     </div>
@@ -3746,6 +3829,24 @@ def book_pnl(trades, spot):
                for strike_or_spot_diff, qty in positions.items())</pre>
           <div class="sol-note">This is almost certainly the "trading book" problem from the Glassdoor reports. The extensions are common follow-ups — separate by option type, compute realized P&L. Practice explaining each line aloud.</div>
         </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas — groupby with map for sign</div>
+          <pre>import pandas as pd
+
+def net_positions_pd(trades):
+    df = pd.DataFrame(trades)
+    df['signed_qty'] = df['qty'] * df['side'].map({'buy': 1, 'sell': -1})
+    net = df.groupby('strike')['signed_qty'].sum()
+    return net[net != 0].to_dict()
+
+# Extension: group by strike and option type simultaneously
+def net_by_type_pd(trades):
+    df = pd.DataFrame(trades)
+    df['signed_qty'] = df['qty'] * df['side'].map({'buy': 1, 'sell': -1})
+    return df.groupby(['option_type', 'strike'])['signed_qty'].sum().to_dict()</pre>
+          <div class="sol-note"><code>Series.map(dict)</code> converts 'buy'/'sell' to +1/-1 in one step — cleaner than <code>.apply(lambda)</code> for simple lookups. <code>groupby.sum()</code> is the pandas equivalent of the defaultdict accumulation loop, running in optimized C. This is the real-world form of the position book.</div>
+        </div>
       </div>
     </div>
 
@@ -3805,6 +3906,23 @@ def options_pnl_breakdown(positions, spot):
         rows.append({**pos, 'intrinsic': intrinsic, 'pnl': pnl})
     return rows</pre>
           <div class="sol-note">Directly tests your understanding of call and put payoffs — course Monday content. Make sure you have `max(spot-strike, 0)` for calls and `max(strike-spot, 0)` for puts memorized cold.</div>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas + NumPy — vectorized payoff</div>
+          <pre>import numpy as np
+import pandas as pd
+
+def options_pnl_pd(positions, spot):
+    df = pd.DataFrame(positions)
+    df['intrinsic'] = np.where(
+        df['type'] == 'call',
+        np.maximum(spot - df['strike'], 0),  # call payoff
+        np.maximum(df['strike'] - spot, 0)   # put payoff
+    )
+    df['pnl'] = df['qty'] * (df['intrinsic'] - df['premium'])
+    return round(df['pnl'].sum(), 4)</pre>
+          <div class="sol-note"><code>np.where(condition, a, b)</code> selects element-wise: picks <code>a</code> where condition is True, else <code>b</code>. <code>np.maximum(x, 0)</code> is the vectorized <code>max(x, 0)</code>. Together they compute intrinsic values for an entire book without a Python loop.</div>
         </div>
       </div>
     </div>
@@ -3866,6 +3984,22 @@ def rolling_vwap(trades, n):
             <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">deque(iterable, maxlen=None)</code> — <b>Input:</b> optional iterable to initialize from; optional max-length cap. <b>Operation:</b> double-ended queue. <code style="color:#93c5fd;font-size:0.8rem;">.append(x)</code> and <code style="color:#93c5fd;font-size:0.8rem;">.popleft()</code> are both O(1) — unlike a list where <code style="color:#93c5fd;font-size:0.8rem;">.pop(0)</code> is O(n). If maxlen is set, adding to a full deque drops the opposite end automatically. <b>Output:</b> deque object, iterable and indexable like a list.</li>
             <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">sum(expr for x in iterable)</code> — <b>Input:</b> a generator expression — evaluated lazily, no intermediate list built. <b>Operation:</b> evaluates expr for each x and sums. <b>Output:</b> single number; zero if iterable is empty. <code style="color:#93c5fd;font-size:0.8rem;">sum(p * v for p, v in trades)</code> computes a dot product in one pass without allocating a list.</li>
           </ul>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas — rolling VWAP in two lines</div>
+          <pre>import pandas as pd
+
+def vwap_pd(trades):
+    df = pd.DataFrame(trades, columns=['price', 'volume'])
+    return (df['price'] * df['volume']).sum() / df['volume'].sum()
+
+def rolling_vwap_pd(trades, n):
+    df = pd.DataFrame(trades, columns=['price', 'volume'])
+    df['value'] = df['price'] * df['volume']
+    vwap = df['value'].rolling(n).sum() / df['volume'].rolling(n).sum()
+    return vwap.dropna().round(4).tolist()</pre>
+          <div class="sol-note"><code>Series.rolling(n).sum()</code> computes a sliding window sum for every position in one call. Dividing two rolling sums gives rolling VWAP — the entire deque loop collapses to two lines. This is the exact pattern used in live trading analytics pipelines.</div>
         </div>
       </div>
     </div>
@@ -3981,6 +4115,18 @@ def top_3_sort(trades):
           <ul style="margin:7px 0 0;padding-left:18px;font-size:0.79rem;color:rgba(255,255,255,0.5);line-height:1.72;">
             <li><code style="color:#93c5fd;background:rgba(255,255,255,0.07);padding:1px 5px;border-radius:3px;font-size:0.8rem;">heapq.nlargest(n, iterable, key=None)</code> — <b>Input:</b> integer n; any iterable; optional key function for ranking. <b>Operation:</b> finds the n largest elements using a size-n min-heap in O(len × log n) — faster than a full sort when n is small. <b>Output:</b> list of n elements in descending order. Mirror: <code style="color:#93c5fd;font-size:0.8rem;">heapq.nsmallest(n, ...)</code>.</li>
           </ul>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas — groupby + nlargest</div>
+          <pre>import pandas as pd
+
+def top_3_trading_days_pd(trades):
+    df = pd.DataFrame(trades, columns=['day', 'volume', 'price'])
+    df['total_value'] = df['volume'] * df['price']
+    daily = df.groupby('day')['total_value'].sum()
+    return daily.nlargest(3).reset_index().values.tolist()</pre>
+          <div class="sol-note"><code>groupby('day').sum()</code> aggregates all rows per day — the pandas version of the defaultdict loop, running in C. <code>Series.nlargest(3)</code> is pandas' equivalent of <code>heapq.nlargest</code>. <code>.reset_index()</code> unpacks the grouped Series into a two-column DataFrame before extracting values.</div>
         </div>
       </div>
     </div>
@@ -4110,6 +4256,22 @@ def max_avg_window_with_index(vols, k):
     return round(best_sum / k, 2), best_start</pre>
           <div class="sol-note">The key pattern: `window_sum += new_element - dropped_element`. This makes the slide O(1) per step instead of O(k). This exact pattern appeared in your SPY options notebook (rolling stats).</div>
         </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas — one-liner with index recovery</div>
+          <pre>import pandas as pd
+
+def max_avg_window_pd(vols, k):
+    return round(pd.Series(vols).rolling(k).mean().max(), 2)
+
+# Also recover the starting index of the best window:
+def max_avg_with_index_pd(vols, k):
+    s        = pd.Series(vols)
+    means    = s.rolling(k).mean()
+    best_end = int(means.idxmax())       # last index of the best window
+    return round(float(means[best_end]), 2), best_end - k + 1</pre>
+          <div class="sol-note"><code>.rolling(k).mean()</code> computes all window averages in one pass; <code>.max()</code> finds the peak. <code>.idxmax()</code> returns its index so you can recover the window's position. Three chained operations replace the entire manual loop.</div>
+        </div>
       </div>
     </div>
 
@@ -4165,6 +4327,22 @@ def rolling_realized_vol(prices, n, trading_days=252):
 # log_rets = np.log(np.array(prices[1:]) / np.array(prices[:-1]))
 # rolling_vol = pd.Series(log_rets).rolling(n).std() * np.sqrt(252)</pre>
           <div class="sol-note">This directly implements the Tuesday lecture formula: daily vol = std(log returns), annual vol = daily × √252. If they ask "implement without numpy" — use the manual std_dev above. If numpy is allowed, use the one-liner at the bottom.</div>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">Pandas + NumPy — production-grade form</div>
+          <pre>import numpy as np
+import pandas as pd
+
+def rolling_realized_vol_pd(prices, n, trading_days=252):
+    s        = pd.Series(prices)
+    log_rets = np.log(s / s.shift(1))           # NaN at index 0
+    roll_vol = log_rets.rolling(n).std() * np.sqrt(trading_days)
+    return roll_vol.dropna().round(4).tolist()
+
+# s.shift(1) aligns each price with its predecessor:
+# s / s.shift(1) == prices[i] / prices[i-1] for every i simultaneously</pre>
+          <div class="sol-note"><code>Series.shift(1)</code> shifts values forward by one row, aligning each price with the one before it. <code>np.log(s / s.shift(1))</code> computes all log returns at once. <code>.rolling(n).std()</code> applies sample standard deviation to every n-window. This is the production version of the manual implementation above.</div>
         </div>
       </div>
     </div>
@@ -4453,6 +4631,19 @@ depths = [4,2,0,3,2,5]
 # The lower side's trapped water is bounded by left_max (or right_max),
 # since the other side is guaranteed to be >= that.</pre>
           <div class="sol-note">This is a hard problem — don't stress if it takes time. The key insight: you don't need to know the global max; you just need to know the max on each side up to your current position. The two-pointer approach processes the binding constraint first.</div>
+        </div>
+        <button class="sol-toggle" onclick="toggleSol(this)" style="margin-top:8px;background:#14532d;color:#86efac;border:none;padding:8px 16px;border-radius:6px;cursor:pointer;font-size:0.85rem;font-weight:600;">Show Pandas / NumPy Version</button>
+        <div class="solution" style="border-left:3px solid #4ade80;margin-top:0;">
+          <div class="sol-label" style="color:#4ade80;">NumPy — accumulate from both ends</div>
+          <pre>import numpy as np
+
+def trap_np(depths):
+    d         = np.array(depths)
+    left_max  = np.maximum.accumulate(d)              # running max left→right
+    right_max = np.maximum.accumulate(d[::-1])[::-1]  # running max right→left
+    water     = np.maximum(np.minimum(left_max, right_max) - d, 0)
+    return int(water.sum())</pre>
+          <div class="sol-note">This expresses the problem's formula directly: water at i = <code>min(left_max[i], right_max[i]) - depth[i]</code>. <code>maximum.accumulate</code> builds both running-max arrays in one pass each. The two-pointer version trades this clarity for O(1) space; the NumPy version is what you'd write in an analytics pipeline.</div>
         </div>
       </div>
     </div>
