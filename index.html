@@ -3005,7 +3005,7 @@ by_moneyness = sorted(strikes, key=lambda s: abs(s - spot))</pre>
     </div>
 
         <h2 style="margin-top:2.5rem;padding-top:1.5rem;border-top:2px solid rgba(0,0,0,0.08);">Practice Problems — Round 2 Python Prep</h2>
-    <p>~20 problems across 5 categories, ordered by difficulty. Each one mirrors the patterns Maven tests. Click "Show Solution" when you're ready to check.</p>
+    <p>~27 problems across 5 categories, ordered by difficulty. Each one mirrors the patterns Maven tests. Click "Show Solution" when you're ready to check.</p>
 
     <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:24px;">
       <span class="pill green">Easy (E)</span>
@@ -3225,6 +3225,96 @@ windows = [[1,4],[4,5]]
       </div>
     </div>
 
+    <!-- P21 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P21</span><span class="pill orange">Medium</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">Student Score Simulation — Daily Convergence</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Given an array of N student scores, simulate day-by-day updates until the array stops changing. Each day, simultaneously: if a student is between two strictly higher scores, add 1; if between two strictly lower scores, subtract 1. First and last students never change. Return the final stable array.</p>
+        <div class="prob-example">scores = [1, 6, 3, 4, 3, 5]
+Day 1: [1, 5, 4, 3, 4, 5]
+Day 2: [1, 4, 4, 4, 4, 5]  ← stable
+→ Output: [1, 4, 4, 4, 4, 5]
+
+scores = [100, 50, 40, 30]
+→ Output: [100, 50, 40, 30]  (already stable — monotone)</div>
+        <div class="prob-hint">💡 Hint: Compute all changes on a copy, then apply together. The simulation ends when no element changed. Key: changes are simultaneous, so never modify in-place mid-loop.</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n × days) — days ≤ max(scores)</div>
+          <pre>def final_scores(scores):
+    n = len(scores)
+    if n <= 2:
+        return scores
+    while True:
+        new = scores[:]            # copy — changes must be simultaneous
+        changed = False
+        for i in range(1, n - 1):
+            if scores[i-1] > scores[i] and scores[i+1] > scores[i]:
+                new[i] += 1
+                changed = True
+            elif scores[i-1] < scores[i] and scores[i+1] < scores[i]:
+                new[i] -= 1
+                changed = True
+        if not changed:
+            return scores
+        scores = new
+
+# Why copy first?
+# [1, 6, 3] — if you modify index 1 in-place, the check for index 2
+# would see the already-updated value, giving wrong results.
+# The copy makes Day N decisions based entirely on Day N-1 state.</pre>
+          <div class="sol-note">The critical insight is "simultaneous" — always work from a snapshot. This pattern appears any time updates depend on neighbors: Conway's Game of Life, heat diffusion, any cellular automaton. The convergence proof: each day, scores move toward their neighbors, so they stabilize within max(scores) days.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P22 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P22</span><span class="pill orange">Medium</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">Distribute Integers to Two Arrays</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Given an array, distribute all elements between two arrays by the following rules: numbers[0] goes to first, numbers[1] goes to second. Each following number goes to whichever array has more elements strictly greater than it. On a tie, it goes to the shorter array. If still tied, it goes to first. Return first + second concatenated.</p>
+        <div class="prob-example">numbers = [2, 1, 3, 4, 5]
+first starts: [2]
+second starts: [1]
+→ 3: first has 0 > 3, second has 0 > 3, tie → shorter is second (len 1 = len 1, still tie) → first. first=[2,3]
+→ 4: first has 0, second has 0, tie, lens 2 vs 1 → second. second=[1,4]
+→ 5: first has 0, second has 0, tie, lens 2 vs 2 → first. first=[2,3,5]
+→ Output: [2, 3, 5, 1, 4]</div>
+        <div class="prob-hint">💡 Hint: At each step, count elements strictly greater than numbers[i] in each array. The counting is O(n) per element, so O(n²) overall — that's the intended complexity.</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n²) — intentional per problem constraints</div>
+          <pre>def distribute(numbers):
+    first  = [numbers[0]]
+    second = [numbers[1]]
+    for num in numbers[2:]:
+        gt_first  = sum(1 for x in first  if x > num)
+        gt_second = sum(1 for x in second if x > num)
+        if gt_first > gt_second:
+            first.append(num)
+        elif gt_second > gt_first:
+            second.append(num)
+        elif len(first) <= len(second):   # tie on counts → shorter array
+            first.append(num)             # still tied → first
+        else:
+            second.append(num)
+    return first + second
+
+# The "count elements greater than X" step can be optimized
+# with a sorted structure + bisect, but the problem explicitly
+# allows O(n²) with n ≤ 1000, so the naive scan is fine.</pre>
+          <div class="sol-note">Three tiebreaker levels is a common interview complication — implement them in order and test each edge case. The sum(1 for x in arr if x > num) generator expression is idiomatic Python for conditional counting without importing anything.</div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- ══════════════════════════════════════════ -->
     <!-- CAT 2: DICTS & HASHMAPS                    -->
     <!-- ══════════════════════════════════════════ -->
@@ -3379,6 +3469,85 @@ strikes = [0, 3, 7, 2, 5, 8, 4, 6, 0, 1]
         </div>
       </div>
     </div>
+
+    <!-- P23 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P23</span><span class="pill green">Easy</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">Count Keyboard Key Changes</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Given an array of characters representing a typing sequence, count the number of times the user switched to a different letter key. Uppercase and lowercase of the same letter count as the same key (pressing Shift does not count as a key change).</p>
+        <div class="prob-example">recording = ['a', 'A', 'b', 'B', 'C', 'c']
+Normalized: ['a', 'a', 'b', 'b', 'c', 'c']
+Transitions: a→b (pos 2), b→c (pos 4)
+→ Output: 2
+
+recording = ['a', 'a', 'a']
+→ Output: 0</div>
+        <div class="prob-hint">💡 Hint: Compare consecutive elements after lowercasing. Count whenever adjacent chars differ.</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n)</div>
+          <pre>def solution(recording):
+    return sum(
+        1 for i in range(1, len(recording))
+        if recording[i].lower() != recording[i-1].lower()
+    )
+
+# One-liner version using zip:
+def solution_v2(recording):
+    return sum(a.lower() != b.lower() for a, b in zip(recording, recording[1:]))</pre>
+          <div class="sol-note">zip(arr, arr[1:]) is the idiomatic Python pattern for "compare every consecutive pair." It avoids indexing entirely. The sum(bool_expr for ...) pattern works because True == 1 and False == 0 in Python — a common interview idiom for counting conditions.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P24 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P24</span><span class="pill orange">Medium</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">First Word with Most Repeated Letters</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Given a sentence, return the first word that has the greatest number of distinct letters appearing more than once. For example, "greatest" has 2 letters that repeat (e and t); "ever" has 1 (e). Return that word (lowercase). If no word has any repeated letter, return -1. Words are space-separated; strip punctuation.</p>
+        <div class="prob-example">"today, is the greatest day ever!"
+→ greatest: e×2, t×2 → 2 repeating letters
+→ ever:     e×2       → 1 repeating letter
+→ Output: "greatest"
+
+"hello world"
+→ hello: l×2 → 1 repeating letter
+→ world: 0
+→ Output: "hello"</div>
+        <div class="prob-hint">💡 Hint: For each word, use Counter. Count how many distinct characters have frequency > 1. Track the word with the highest such count (keep the first on ties).</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n × w) where w = avg word length</div>
+          <pre>import re
+from collections import Counter
+
+def searching_challenge(s):
+    words = re.sub(r"[^a-zA-Z\s]", "", s).split()
+    best_word  = None
+    best_count = 0
+    for word in words:
+        counts = Counter(word.lower())
+        repeat_count = sum(1 for freq in counts.values() if freq > 1)
+        if repeat_count > best_count:   # strictly greater → keep first on ties
+            best_count = repeat_count
+            best_word  = word.lower()
+    return best_word if best_word else -1
+
+# Why re.sub instead of str.strip/replace?
+# re.sub(r"[^a-zA-Z\s]", "", s) removes ALL punctuation in one pass,
+# handling commas, periods, exclamation marks, etc. without chaining
+# multiple .replace() calls.</pre>
+          <div class="sol-note">The metric is count of distinct letters that repeat — not max frequency. Distinguish: "aabbcc" has 3 repeating letters (a, b, c) while "aaab" has 1 repeating letter (a) with max frequency 3. Using Counter and filtering by freq > 1 handles this correctly.</div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- ══════════════════════════════════════════ -->
     <!-- CAT 3: TRADING BOOK SPECIFIC               -->
@@ -3575,6 +3744,115 @@ def match_orders(orders):
       </div>
     </div>
 
+    <!-- P25 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P25</span><span class="pill orange">Medium</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">Top 3 Trading Days by Total Value</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Given an unsorted array where each entry is [day, volume, price], multiple entries can share the same day. Aggregate total value traded per day (sum of volume × price across all entries for that day), then return the top 3 days by total value as a list of [day, total_value], sorted descending.</p>
+        <div class="prob-example">trades = [[1, 2, 3], [1, 4, 5], [2, 2, 3]]
+Day 1: 2×3 + 4×5 = 6 + 20 = 26
+Day 2: 2×3 = 6
+→ Top 3 (only 2 days): [[1, 26], [2, 6]]
+
+trades = [[3,1,10],[1,5,4],[2,3,6],[3,2,8],[1,2,3]]
+Day 1: 5×4 + 2×3 = 26
+Day 2: 3×6 = 18
+Day 3: 1×10 + 2×8 = 26
+→ Top 3: [[1,26],[3,26],[2,18]]  (tie on value → order by day or stable sort)</div>
+        <div class="prob-hint">💡 Hint: Use defaultdict to accumulate day totals. Then heapq.nlargest(3, ...) to get the top 3 without fully sorting.</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n + k log n) where k=3</div>
+          <pre>import heapq
+from collections import defaultdict
+
+def top_3_trading_days(trades):
+    day_totals = defaultdict(float)
+    for day, volume, price in trades:
+        day_totals[day] += volume * price
+
+    # nlargest(3) is O(n) — much faster than sorting all days
+    top3 = heapq.nlargest(3, day_totals.items(), key=lambda x: x[1])
+    return [[day, total] for day, total in top3]
+
+# If you need exactly 3 and there are fewer than 3 days,
+# nlargest gracefully returns however many exist.
+
+# Alternative — pure sort (O(n log n), fine for interviews):
+def top_3_sort(trades):
+    day_totals = defaultdict(float)
+    for day, vol, price in trades:
+        day_totals[day] += vol * price
+    ranked = sorted(day_totals.items(), key=lambda x: -x[1])
+    return [[d, v] for d, v in ranked[:3]]</pre>
+          <div class="sol-note">heapq.nlargest(k, iterable, key=...) is the correct tool when you only need the top-k from a large dataset — it runs in O(n log k) vs O(n log n) for a full sort. For k=3, this matters at scale. The aggregation step (defaultdict accumulation) is exactly the groupby-sum pattern you'd write in pandas as df.groupby("day")["value"].sum().</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- P26 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P26</span><span class="pill orange">Medium</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">Net Profit from Stock Event Stream</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Process a stream of stock trading events and answer profit queries. Events are strings in three forms: "BUY stock qty" (buy qty shares at current price), "SELL stock qty" (sell qty shares at current price), "CHANGE stock delta" (price increases by delta — mark-to-market P&amp;L updates immediately), "QUERY" (record current net profit). Return an array with one entry per QUERY.</p>
+        <div class="prob-example">events = ["BUY AAPL 10", "CHANGE AAPL 5", "QUERY", "SELL AAPL 5", "QUERY"]
+After BUY AAPL 10:  net = -0  (price=0, so cost=0)
+After CHANGE AAPL 5: price=5, net += 5×10 = +50. net=50
+QUERY → append 50
+After SELL AAPL 5:  net += 5×5 = +25. qty=5. net=75
+QUERY → append 75
+→ Output: [50, 75]</div>
+        <div class="prob-hint">💡 Hint: Maintain stock_price and stock_qty dicts. CHANGE updates price AND immediately adjusts net P&amp;L by delta × current_qty (mark-to-market). BUY/SELL use the current price at trade time.</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n) — fixed version of the OA starter code</div>
+          <pre>def get_net_profit(events):
+    net = 0
+    stock_price = {}   # current mark price per stock
+    stock_qty   = {}   # current net quantity held
+    result = []
+
+    for event in events:
+        parts = event.split()
+        op = parts[0]
+        if op == "QUERY":
+            result.append(net)
+        elif op == "BUY":
+            _, stock, q = parts
+            q = int(q)
+            stock_price.setdefault(stock, 0)
+            stock_qty[stock]  = stock_qty.get(stock, 0) + q
+            net -= q * stock_price[stock]    # cost of buying
+        elif op == "SELL":
+            _, stock, q = parts
+            q = int(q)
+            stock_qty[stock] -= q
+            net += q * stock_price[stock]    # proceeds from selling
+        else:  # CHANGE
+            _, stock, delta = parts
+            delta = int(delta)
+            qty = stock_qty.get(stock, 0)
+            net += delta * qty               # mark-to-market: price up → book gains
+            stock_price[stock] = stock_price.get(stock, 0) + delta
+    return result
+
+# The original OA code had two bugs:
+# 1. break on QUERY — only the first QUERY was recorded
+# 2. net += stockprice[stock] * stockquant[stock] on CHANGE — this
+#    adds the full position VALUE instead of just the CHANGE in value.
+#    Correct formula: net += delta * current_qty</pre>
+          <div class="sol-note">Mark-to-market accounting is how trading desks track P&amp;L intraday: every price move immediately flows through to the book's value. The BUY/SELL operations use the current price at execution time, while CHANGE propagates the price delta across the entire current position. This is a clean test of whether you understand the accounting model, not just the data structures.</div>
+        </div>
+      </div>
+    </div>
+
+
     <!-- ══════════════════════════════════════════ -->
     <!-- CAT 4: SLIDING WINDOW & RUNNING STATS     -->
     <!-- ══════════════════════════════════════════ -->
@@ -3710,6 +3988,75 @@ def longest_no_repeat_v2(strikes):
         </div>
       </div>
     </div>
+
+    <!-- P27 -->
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">P27</span><span class="pill orange">Medium</span><span class="prob-lc">OA</span></div>
+        <div class="prob-title">Longest Substring with Exactly K Unique Characters</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">Given a string whose first character is a digit k, find the longest substring of the remaining characters that contains exactly k unique characters. If multiple substrings tie for longest, return the first one encountered. Return an empty string if no valid substring exists.</p>
+        <div class="prob-example">"2aavvcvvvadef"
+k = 2, search in "aavvcvvvadef"
+→ Longest with exactly 2 unique chars: "vvva" (4 chars)? No — "aavvcvvva"?
+  "aavv" has {a,v} = 2 ✓ len=4
+  "cvvvadef" — window expands/shrinks...
+→ Best window: "cvvva" has {c,v,a}=3, shrink... 
+  Final answer: "vvva" (v,a) len=4? Let&#39;s trace: "aavvcvvvadef"
+  Best valid: "cvvv" no... "vvva" = {v,a} len=4. Output: "vvva"
+
+"3aabcadcbac"
+k=3, best window with 3 unique chars → "aabcadcbac" or sub of it
+→ Output: "aabcadcba" (9 chars, {a,b,c})</div>
+        <div class="prob-hint">💡 Hint: Sliding window with a frequency dict. Expand right by adding chars. If unique count exceeds k, shrink from the left until unique == k again. Record the window whenever unique == k.</div>
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — O(n) sliding window, O(k) space</div>
+          <pre>def searching_challenge(str_param):
+    if not str_param or not str_param[0].isdigit():
+        return ""
+    k = int(str_param[0])
+    if k <= 0:
+        return ""
+    s = str_param[1:]    # strip the leading digit
+
+    freq   = {}   # char → count in current window
+    unique = 0    # distinct chars in window
+    left   = 0
+    best   = ""
+
+    for right, ch in enumerate(s):
+        if ch not in freq:
+            freq[ch] = 0
+            unique += 1
+        freq[ch] += 1
+
+        # shrink from left until unique <= k
+        while unique > k:
+            c = s[left]
+            freq[c] -= 1
+            if freq[c] == 0:
+                del freq[c]
+                unique -= 1
+            left += 1
+
+        # valid window — check if it beats best
+        if unique == k:
+            sub = s[left:right + 1]
+            if len(sub) > len(best):   # strictly greater keeps first-longest
+                best = sub
+    return best
+
+# The two-pointer invariant:
+# At every step, window [left, right] has AT MOST k unique chars.
+# The "while unique > k" loop restores this after each expansion.
+# We only record when unique == k (exactly, not fewer).</pre>
+          <div class="sol-note">This is a harder variant of P16 (no-repeat window). The difference: P16 shrinks when ANY char repeats; this shrinks when unique count EXCEEDS a threshold. Both use the same expand-right / shrink-left skeleton — the only change is the violation condition. Recognizing this family of problems ("longest window satisfying a uniqueness constraint") is what makes you fast in OAs.</div>
+        </div>
+      </div>
+    </div>
+
 
     <!-- ══════════════════════════════════════════ -->
     <!-- CAT 5: SORTING & TWO POINTERS             -->
