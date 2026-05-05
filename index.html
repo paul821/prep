@@ -4235,6 +4235,100 @@ options = [2, 0, 1]
       </tbody>
     </table>
 
+    <h3 style="margin-top:32px;">Quick Reference — Functions Used in These Problems</h3>
+    <p style="font-size:0.87rem;color:#5a6070;margin-bottom:12px;">Functions that appear in the solutions above but whose mechanics are easy to forget. Each entry: signature → inputs → what it does → output.</p>
+    <table>
+      <thead>
+        <tr style="background:#0f1e3c;">
+          <th style="color:#fff;padding:8px;min-width:200px;">Function</th>
+          <th style="color:#fff;padding:8px;">Inputs</th>
+          <th style="color:#fff;padding:8px;">Operation</th>
+          <th style="color:#fff;padding:8px;">Output</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>enumerate(iterable, start=0)</code></td>
+          <td>Any iterable (list, string, …); optional integer start index</td>
+          <td>Wraps each element with a counter. Produces pairs of (index, value) as it iterates — does NOT build a new list in memory.</td>
+          <td>Iterator of <code>(int, item)</code> tuples. Typically unpacked as <code>for i, val in enumerate(arr)</code>.</td>
+        </tr>
+        <tr>
+          <td><code>zip(iter1, iter2, …)</code></td>
+          <td>Two or more iterables of any type</td>
+          <td>Steps through all iterables in lockstep, pairing the i-th element of each. Stops at the shortest iterable.</td>
+          <td>Iterator of tuples. <code>zip([1,2,3], ['a','b','c'])</code> → <code>(1,'a'), (2,'b'), (3,'c')</code>. Common pattern: <code>zip(arr, arr[1:])</code> to get consecutive pairs.</td>
+        </tr>
+        <tr>
+          <td><code>sum(iterable, start=0)</code></td>
+          <td>Iterable of numbers (or a generator expression); optional starting value</td>
+          <td>Adds all elements together, beginning from start. When given a generator like <code>sum(1 for x in arr if cond)</code>, it counts elements satisfying the condition without building an intermediate list.</td>
+          <td>Single number (int or float).</td>
+        </tr>
+        <tr>
+          <td><code>sorted(iterable, key=None, reverse=False)</code></td>
+          <td>Any iterable; optional key function; optional reverse flag</td>
+          <td>Returns a new sorted list — the original is NOT modified (unlike <code>.sort()</code> which is in-place). The key function is called on each element to produce the comparison value: <code>key=lambda x: x[1]</code> sorts by second element.</td>
+          <td>New list in sorted order.</td>
+        </tr>
+        <tr>
+          <td><code>heapq.nlargest(n, iterable, key=None)</code></td>
+          <td>Integer n; any iterable; optional key function</td>
+          <td>Finds the n largest elements without fully sorting. Internally maintains a min-heap of size n, so it runs in O(len × log n) — faster than sort when n is small relative to the list.</td>
+          <td>List of n elements in descending order.</td>
+        </tr>
+        <tr>
+          <td><code>heapq.heappush(heap, item)</code></td>
+          <td>A list (used as the heap); item to insert</td>
+          <td>Inserts item into the heap while preserving the min-heap property (smallest element always at index 0). Modifies the list in place.</td>
+          <td>None. Side effect: heap list is updated.</td>
+        </tr>
+        <tr>
+          <td><code>heapq.heappop(heap)</code></td>
+          <td>A list in heap order</td>
+          <td>Removes and returns the smallest element (index 0), then re-heapifies to restore the min-heap property.</td>
+          <td>The minimum element. Raises IndexError on empty heap.</td>
+        </tr>
+        <tr>
+          <td><code>dict.get(key, default=None)</code></td>
+          <td>Key to look up; optional default value</td>
+          <td>Returns the value for key if it exists. If not, returns default instead of raising KeyError. The dict is never modified.</td>
+          <td>Value (any type) or default.</td>
+        </tr>
+        <tr>
+          <td><code>dict.setdefault(key, default=None)</code></td>
+          <td>Key; optional default value</td>
+          <td>If key already exists, returns its current value (no change). If key is absent, inserts it with the default value AND returns the default. Different from <code>.get()</code>: this one writes to the dict.</td>
+          <td>Value at key after the call.</td>
+        </tr>
+        <tr>
+          <td><code>defaultdict(factory)</code></td>
+          <td>A callable (e.g. <code>int</code>, <code>list</code>, <code>float</code>, or a lambda)</td>
+          <td>Behaves exactly like a dict, but when a missing key is accessed, it calls factory() to create a default value and inserts it automatically. <code>defaultdict(int)</code> → missing keys default to 0. <code>defaultdict(list)</code> → missing keys default to [].</td>
+          <td>A dict-like object. Access <code>d[missing_key]</code> without KeyError.</td>
+        </tr>
+        <tr>
+          <td><code>Counter(iterable)</code></td>
+          <td>Any iterable of hashable elements</td>
+          <td>Counts occurrences of each element. Internally a dict subclass: <code>Counter("aabbc")</code> → <code>{'a':2,'b':2,'c':1}</code>. Supports arithmetic: two Counters can be added or subtracted.</td>
+          <td>Counter object (dict subclass). Key methods: <code>.most_common(n)</code> returns the n highest-count items as [(item, count), …].</td>
+        </tr>
+        <tr>
+          <td><code>re.sub(pattern, repl, string)</code></td>
+          <td>Regex pattern string; replacement string; target string</td>
+          <td>Finds all substrings matching pattern and replaces them with repl. <code>re.sub(r"[^a-zA-Z\s]", "", s)</code> removes every character that is NOT a letter or whitespace — the standard way to strip punctuation before splitting into words.</td>
+          <td>New string with substitutions applied. Original string is not modified.</td>
+        </tr>
+        <tr>
+          <td><code>collections.deque(iterable, maxlen=None)</code></td>
+          <td>Optional iterable to initialize from; optional max length</td>
+          <td>A double-ended queue. <code>.append(x)</code> and <code>.appendleft(x)</code> add to either end in O(1). <code>.pop()</code> and <code>.popleft()</code> remove from either end in O(1). If maxlen is set, new items push out old ones automatically.</td>
+          <td>deque object. Iterable and indexable like a list, but O(1) on both ends instead of O(n) for front operations.</td>
+        </tr>
+      </tbody>
+    </table>
+
+
     <div class="summary-box">
       <h3>Round 2 Practice — Strategy</h3>
       <ul>
