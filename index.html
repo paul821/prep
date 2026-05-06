@@ -2162,6 +2162,14 @@
       <p>Built from the actual JD + Glassdoor interview reports. You've passed Round 1. Here's everything you need for the next rounds.</p>
     </div>
 
+
+    <!-- ── Maven Intro ── -->
+    <div style="background:#0c2340;border:2px solid #3b82f6;border-radius:10px;padding:18px 22px;margin-bottom:22px;">
+      <div style="color:#60a5fa;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;margin-bottom:8px;">YOUR INTRO FOR MAVEN — USE THIS, NOT THE GENERIC TEMPLATE</div>
+      <p style="color:#e2e8f0;font-size:0.93rem;line-height:1.65;margin:0 0 10px;">"I'm a junior at Northwestern in IE and Econ. The most relevant thing I've done is the IEMS 373 project — we built a long strangle thesis on FedEx using implied vol, Black-Scholes, and LSTM-driven price forecasts to stress-test our strike selection. I led that project. Outside of that, I've done Markov regime-switching on VIX for my honors thesis and gradient-based calibration in PyTorch for epidemic modeling. I sit at the quantitative-meets-real-data intersection — which is what I understand Maven does."</p>
+      <p style="color:#94a3b8;font-size:0.82rem;margin:0;"><strong style="color:#f59e0b;">Why this version works:</strong> Opens with institution + major (credibility), leads with the most trading-adjacent project immediately, names the specific techniques (IV, BSM, LSTM), states your role (led the project), then anchors to Maven's description of itself. Under 60 seconds spoken.</p>
+    </div>
+
     <!-- ── Process Overview ── -->
     <h3>The Full Interview Process</h3>
     <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:12px; margin-bottom:20px;">
@@ -2231,6 +2239,69 @@ def pnl_at_expiry(position, spot):
     </div>
     <div class="beginner">
       The "complement the code" question means they give you a partial function with a clear purpose and ask you to fill in the missing logic. Read the existing code carefully — the variable names and structure will tell you exactly what's expected. Don't over-engineer it.
+    </div>
+
+
+
+    <h4 style="margin-top:1.8rem;color:#ef4444;">Common Bugs — Fix These Cold</h4>
+    <p style="color:#5a6070;font-size:0.9rem;margin-bottom:14px;">These four bugs appear in "complete the function" questions. Each one is a subtle mistake that compiles but produces wrong output — exactly what interviewers test.</p>
+
+    <div class="grid-2">
+      <div class="card" style="border-top:3px solid #ef4444;">
+        <h4 style="color:#ef4444;">Bug 1 — Wrong defaultdict factory</h4>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:0.81rem;line-height:1.7;overflow-x:auto;margin:10px 0;"># BUG: factory should be a callable, not a value
+book = defaultdict(0)          # ❌ TypeError at runtime
+book = defaultdict(int)        # ✅ int() returns 0
+book = defaultdict(list)       # ✅ list() returns []
+book = defaultdict(lambda: {}) # ✅ lambda needed for mutable defaults</pre>
+        <p style="font-size:0.82rem;color:#b45309;"><strong>Rule:</strong> The argument to <code>defaultdict</code> must be a <em>callable</em> (no-arg function). Passing a literal value (<code>0</code>, <code>[]</code>, <code>{}</code>) raises <code>TypeError</code> immediately.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid #ef4444;">
+        <h4 style="color:#ef4444;">Bug 2 — Augmented assignment on new key</h4>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:0.81rem;line-height:1.7;overflow-x:auto;margin:10px 0;"># BUG: KeyError on first access for plain dict
+d = {}
+d["SPY"] += 100   # ❌ KeyError — "SPY" doesn't exist yet
+
+# Fix option 1: initialize explicitly
+d["SPY"] = d.get("SPY", 0) + 100   # ✅
+
+# Fix option 2: use defaultdict
+d = defaultdict(int)
+d["SPY"] += 100   # ✅ auto-initializes to 0</pre>
+        <p style="font-size:0.82rem;color:#b45309;"><strong>Rule:</strong> <code>+=</code> reads before it writes. On a plain dict, reading a missing key raises <code>KeyError</code>. Use <code>.get(key, 0)</code> or <code>defaultdict(int)</code>.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid #ef4444;">
+        <h4 style="color:#ef4444;">Bug 3 — Iterating dict gives keys, not tuples</h4>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:0.81rem;line-height:1.7;overflow-x:auto;margin:10px 0;"># BUG: iterating dict directly gives only keys
+position = {"AAPL": 100, "GOOG": -50}
+for strike, qty in position:        # ❌ ValueError: too many values
+    pnl += qty * payoff(strike)
+
+# Fix: use .items()
+for strike, qty in position.items(): # ✅
+    pnl += qty * payoff(strike)</pre>
+        <p style="font-size:0.82rem;color:#b45309;"><strong>Rule:</strong> <code>for k in d</code> yields keys only. <code>for k, v in d.items()</code> yields (key, value) pairs. The unpacking <code>strike, qty</code> needs <code>.items()</code>.</p>
+      </div>
+
+      <div class="card" style="border-top:3px solid #ef4444;">
+        <h4 style="color:#ef4444;">Bug 4 — Variable from outer scope silently used</h4>
+        <pre style="background:#1e293b;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:0.81rem;line-height:1.7;overflow-x:auto;margin:10px 0;"># BUG: 'spot' referenced but not passed as parameter
+def pnl_at_expiry(position):
+    pnl = 0
+    for strike, qty in position.items():
+        intrinsic = max(spot - strike, 0)  # ❌ 'spot' undefined here
+    return pnl
+
+# Fix: add spot as a parameter
+def pnl_at_expiry(position, spot):         # ✅
+    pnl = 0
+    for strike, qty in position.items():
+        intrinsic = max(spot - strike, 0)
+    return pnl</pre>
+        <p style="font-size:0.82rem;color:#b45309;"><strong>Rule:</strong> Functions should receive all their inputs as explicit parameters. If a variable isn't defined locally or as a parameter, Python will search outer scopes — silently using a stale value or crashing with <code>NameError</code>.</p>
+      </div>
     </div>
 
     <h3 style="margin-top:2rem;">Python Foundations — Data Structures &amp; When to Use Them</h3>
@@ -2354,6 +2425,26 @@ by_expiry = defaultdict(list)  # missing key → auto-starts as []
 for t in trades:
     by_expiry[t["expiry"]].append(t)</pre>
       <p style="font-size:0.82rem;color:#b45309;margin:4px 0;"><strong>⚠️ Gotchas:</strong> Accessing a missing key in defaultdict CREATES that key (side effect!). Don't use defaultdict when you want KeyError to surface bugs — use plain dict then. Use <code>defaultdict(int)</code> for counting, <code>defaultdict(list)</code> for grouping, <code>defaultdict(float)</code> for sums.</p>
+
+      <p style="font-size:0.87rem;font-weight:600;color:#2563eb;margin:12px 0 4px;">Why does defaultdict require a callable — and why lambda?</p>
+      <p style="font-size:0.85rem;color:#475569;margin:0 0 6px;">The argument to <code>defaultdict</code> is called the <em>default factory</em>. When you access a missing key, Python calls <code>factory()</code> with no arguments to produce the initial value. This means you cannot pass a literal — <code>defaultdict(0)</code> raises <code>TypeError</code> because <code>0</code> is not callable. You must pass the <em>type</em> itself (<code>int</code>, <code>list</code>, <code>float</code>), which Python will call as <code>int()</code> → <code>0</code>, <code>list()</code> → <code>[]</code>. For non-trivial defaults (a dict, a specific starting value, or a nested structure), you need <code>lambda</code> because there is no built-in type whose zero-arg call produces what you want:</p>
+      <pre style="background:#1e293b;color:#e2e8f0;padding:14px 16px;border-radius:8px;font-size:0.81rem;line-height:1.7;overflow-x:auto;margin:6px 0 8px;">from collections import defaultdict
+
+# Built-in factories — zero-arg call returns the zero value
+defaultdict(int)    # int() → 0
+defaultdict(list)   # list() → []
+defaultdict(float)  # float() → 0.0
+
+# lambda required when the default isn't a built-in type's zero value
+vol_surface = defaultdict(lambda: {})   # dict() would also work here
+nested      = defaultdict(lambda: defaultdict(list))  # nested structure
+with_offset = defaultdict(lambda: 100)  # fixed non-zero starting value
+
+# Interview gotcha: passing the VALUE rather than the callable
+bad  = defaultdict({})   # ❌ TypeError: first argument must be callable
+good = defaultdict(dict) # ✅ dict() → {}  (same result, right form)</pre>
+      <p style="font-size:0.82rem;color:#475569;margin:0;"><strong>One-line answer for the interview:</strong> "defaultdict calls its factory argument with no arguments to create the missing value — so the argument has to be callable. For simple types, pass <code>int</code> or <code>list</code>. For anything else, pass a <code>lambda</code>."</p>
+
     </div>
 
     <div class="py-card">
@@ -5286,6 +5377,51 @@ you make more from gamma scalping than you paid in premium → profit.
       <div class="concept">
         <p>"As team leader, we built a long strangle thesis on FedEx. The thesis had two legs: first, we found macro catalysts — supply chain dynamics and shipping demand data — that we believed could cause a large move in either direction. Second, we used implied volatility analysis and premium data to assess whether the options were priced fairly for that uncertainty. We then used Black-Scholes to price the specific strikes we were considering and back-calculated the breakeven thresholds — how much the stock had to move for us to profit. We also applied LSTM-driven forecasts to stress-test the vol assumptions. The decision to go long the strangle rather than take a directional position was deliberate — we were confident in the uncertainty but not the direction."</p>
       </div>
+    </div>
+
+
+
+    <div class="card" style="border-top:3px solid #f59e0b;">
+      <h4 style="color:#f59e0b;">The FedEx Story — Tell It This Way</h4>
+      <p style="font-size:0.85rem;color:#475569;margin:0 0 12px;">The existing answer is accurate but flat. This version has structure: Part 1 is the team thesis (what you built together), Part 2 is your personal extension. When you separate them, it sounds like a richer project and it's easier for the interviewer to ask follow-up questions on either layer.</p>
+
+      <div class="concept" style="margin-bottom:12px;">
+        <p style="font-weight:700;color:#fbbf24;margin:0 0 6px;">Part 1 — Class Thesis (what the team built)</p>
+        <p style="margin:0;">"The thesis started from two macro catalysts we identified: tariff uncertainty creating shipping volume risk, and USPS competing for last-mile delivery. Both pointed to a large move in FedEx's stock — but we couldn't determine direction. That's exactly the setup for a long strangle. We screened for strikes by analyzing implied volatility: the 195 put carried IV of 38.14% and the 240 call carried 35.67%, both above the 30-day HV baseline, which confirmed the market was embedding premium for a real event. We bought the 195P and 240C for a combined premium of $1.81 — with FDX spot at $217.83 at initiation. That put the breakevens at $193.19 on the downside and $241.81 on the upside."</p>
+      </div>
+
+      <div class="concept" style="margin-bottom:12px;">
+        <p style="font-weight:700;color:#60a5fa;margin:0 0 6px;">Part 2 — Your Personal Extension (LSTM + BSM)</p>
+        <p style="margin:0;">"I took the analysis further independently. I trained an LSTM on historical FDX price series to generate a 30-day ahead price forecast, and ran those forecasts through Black-Scholes to reprice our options at the forecast spot. The LSTM preferred the 200/225 strangle over the 195/240 — it forecast a smaller but more probable move. The 195/240 was the class selection, and the LSTM marked it as supported but suboptimal. At June 14 settlement, FDX closed at $218.10 — essentially flat — and we lost the full $1.81 premium. By July 25, FDX was at $243.20: the 195/240 would have returned +$1.41, but the 200/225 the LSTM preferred would have returned +$13.21."</p>
+      </div>
+
+      <div class="concept" style="margin-bottom:12px;">
+        <p style="font-weight:700;color:#a78bfa;margin:0 0 6px;">One-sentence version (for quick follow-ups)</p>
+        <p style="margin:0;">"We bought a 195P/240C strangle on FedEx at $1.81 total premium with spot at $217.83, motivated by tariff and USPS catalysts — expired worthless in June, but the position would have been profitable by $1.41 three weeks later when FDX hit $243."</p>
+      </div>
+
+      <div class="concept">
+        <p style="font-weight:700;color:#34d399;margin:0 0 6px;">If asked: how does the thesis change given US-Iran war context?</p>
+        <p style="margin:0;">"The original thesis was about shipping demand uncertainty — tariffs compressing margins, USPS competing for volume. A US-Iran conflict adds a second layer: energy prices spike, which raises FedEx's fuel costs directly and compresses margins further on the downside. It also raises the probability of a sharp discontinuous drop rather than a slow drift — which makes the put leg more valuable and shifts the expected skew of outcomes to the left. I'd widen the put wing (maybe 185P instead of 195P) and accept paying a slightly higher combined premium to capture that tail better. The call leg stays — if conflict de-escalates, a risk-on rally could push FDX higher. The strangle logic still holds; the optimal strike selection shifts."</p>
+      </div>
+    </div>
+
+    <!-- Long Strangle Breakeven callout -->
+    <div style="background:#0c1f12;border:2px solid #22c55e;border-radius:10px;padding:18px 22px;margin:16px 0 22px;">
+      <div style="color:#4ade80;font-size:0.78rem;font-weight:700;letter-spacing:0.08em;margin-bottom:10px;">LONG STRANGLE BREAKEVEN FORMULA — KNOW THIS COLD</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px;">
+        <div style="background:#0f2d1a;border-radius:8px;padding:12px 16px;">
+          <div style="color:#86efac;font-size:0.8rem;font-weight:600;margin-bottom:4px;">Upper Breakeven</div>
+          <div style="color:#f0fdf4;font-size:1.05rem;font-weight:700;font-family:monospace;">Call Strike + Total Premium</div>
+          <div style="color:#6ee7b7;font-size:0.82rem;margin-top:6px;">FedEx: 240 + 1.81 = <strong style="color:#fff;">$241.81</strong></div>
+        </div>
+        <div style="background:#0f2d1a;border-radius:8px;padding:12px 16px;">
+          <div style="color:#86efac;font-size:0.8rem;font-weight:600;margin-bottom:4px;">Lower Breakeven</div>
+          <div style="color:#f0fdf4;font-size:1.05rem;font-weight:700;font-family:monospace;">Put Strike − Total Premium</div>
+          <div style="color:#6ee7b7;font-size:0.82rem;margin-top:6px;">FedEx: 195 − 1.81 = <strong style="color:#fff;">$193.19</strong></div>
+        </div>
+      </div>
+      <p style="color:#94a3b8;font-size:0.83rem;margin:0;">The stock must move outside this range by expiry for the position to profit. FDX at initiation: <strong style="color:#e2e8f0;">$217.83</strong>. Required move: ≥<strong style="color:#e2e8f0;">$24.64 down</strong> (11.3%) or ≥<strong style="color:#e2e8f0;">$23.98 up</strong> (11.0%). At June 14 close of $218.10: $0.27 above entry — <strong style="color:#ef4444;">full premium lost.</strong> At July 25 close of $243.20: above upper breakeven by $1.39 — <strong style="color:#4ade80;">+$1.41 on 195/240, +$13.21 on 200/225.</strong></p>
     </div>
 
     <div class="card">
