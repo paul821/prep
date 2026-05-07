@@ -5143,6 +5143,141 @@ def reconcile_trades(trades_a, trades_b):
       </div>
     </div>
 
+    <h4 style="margin-top:1.8rem;color:#dc2626;">Round 2 Hard Mode — OrderBook Class</h4>
+    <div class="beginner" style="margin-bottom:14px;">
+      This type of question appeared in a real Maven Round 2. An <code>OrderBook</code> class is given with some methods already implemented. You need to complete <code>fill_order</code> and <code>match_order</code>. Write pseudocode first, then implement. The interviewer is watching your logic, not just your syntax.
+    </div>
+
+    <div class="prob">
+      <div class="prob-header">
+        <div class="prob-meta"><span class="prob-num">CPF7</span> <span class="prob-tag">Complete Partial</span> <span class="prob-tag">Hard</span></div>
+        <div class="prob-title">Complete <code>fill_order</code> and <code>match_order</code> in an OrderBook class</div>
+      </div>
+      <div class="prob-body">
+        <p class="prob-desc">An <code>OrderBook</code> class tracks resting buy and sell orders by price level. <code>add_order</code> is already implemented. Complete the two missing methods below.</p>
+        <div class="prob-example">
+<strong>Example:</strong>
+<pre style="background:#1e1e2e;color:#cdd6f4;padding:10px 14px;border-radius:6px;font-size:0.82rem;line-height:1.7;margin:6px 0;overflow-x:auto;">book = OrderBook()
+book.add_order('sell', 101, 50)   # ask: {101: 50}
+book.add_order('sell', 102, 30)   # ask: {101: 50, 102: 30}
+book.add_order('buy',  99,  20)   # bid: {99: 20}
+
+book.fill_order('buy', 101, 40)   # fills 40 at ask $101 → returns 40
+# ask is now {101: 10, 102: 30}
+
+book.match_order('buy', 102, 10)  # best ask ≤ 102 → returns 101</pre>
+        </div>
+        <div class="prob-hint">💡 Hint: <code>fill_order</code> needs to sort candidates before iterating — order matters for best execution. <code>match_order</code> should NOT modify the book — just find the best price.</div>
+
+        <div style="background:#1e293b;border-radius:8px;padding:14px 16px;margin:12px 0;">
+          <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;">The Problem Skeleton</div>
+          <pre style="background:transparent;color:#e2e8f0;padding:0;font-size:0.81rem;line-height:1.75;overflow-x:auto;margin:0;">class OrderBook:
+    def __init__(self):
+        self.bids = {}  # price -&gt; qty (resting buy orders)
+        self.asks = {}  # price -&gt; qty (resting sell orders)
+
+    def add_order(self, side, price, qty):
+        # Already implemented. Adds a resting order to the book.
+        book = self.bids if side == 'buy' else self.asks
+        book[price] = book.get(price, 0) + qty
+
+    def fill_order(self, side, price, qty):
+        # An incoming order arrives. Fill it against the resting book.
+        #
+        # - Incoming BUY:  fills against asks at or BELOW the given price.
+        #                  Fill from lowest ask first (best price for buyer).
+        # - Incoming SELL: fills against bids at or ABOVE the given price.
+        #                  Fill from highest bid first (best price for seller).
+        #
+        # Remove filled quantities from the book (partial fills allowed).
+        # Return the total quantity filled.
+        pass  # TODO: implement
+
+    def match_order(self, side, price, qty):
+        # Find the single best available price to fill the incoming order.
+        #
+        # - Incoming BUY:  return the lowest ask price that is &lt;= given price.
+        # - Incoming SELL: return the highest bid price that is &gt;= given price.
+        #
+        # Return the best price as a number, or None if no match exists.
+        # Do NOT modify the book.
+        pass  # TODO: implement</pre>
+        </div>
+
+        <button class="sol-toggle" onclick="toggleSol(this)">Show Solution</button>
+        <div class="solution">
+          <div class="sol-label">Solution — fill_order + match_order</div>
+          <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.12);">
+            <div style="color:#00b4a0;font-size:0.73rem;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;">▶ Pseudocode First (write this before touching code)</div>
+            <div style="color:#cbd5e1;font-size:0.83rem;font-weight:600;margin:8px 0 4px;">fill_order:</div>
+            <pre style="background:rgba(0,0,0,0.3);color:#e2e8f0;padding:10px 14px;border-radius:6px;font-size:0.81rem;line-height:1.75;overflow-x:auto;margin:0 0 10px;">if side is buy:
+    candidates = all ask prices &lt;= given price, sorted lowest first
+else:
+    candidates = all bid prices &gt;= given price, sorted highest first
+
+remaining = qty
+for each candidate price:
+    filled = min(remaining, book[candidate_price])
+    reduce book[candidate_price] by filled
+    if book[candidate_price] == 0: remove that price level
+    remaining -= filled
+    if remaining == 0: break
+
+return qty - remaining  (total filled)</pre>
+            <div style="color:#cbd5e1;font-size:0.83rem;font-weight:600;margin:8px 0 4px;">match_order:</div>
+            <pre style="background:rgba(0,0,0,0.3);color:#e2e8f0;padding:10px 14px;border-radius:6px;font-size:0.81rem;line-height:1.75;overflow-x:auto;margin:0;">if side is buy:
+    valid = [p for p in asks if p &lt;= given price]
+    return min(valid) if valid else None
+else:
+    valid = [p for p in bids if p &gt;= given price]
+    return max(valid) if valid else None</pre>
+          </div>
+          <pre>def fill_order(self, side, price, qty):
+    book = self.asks if side == 'buy' else self.bids
+    # For buys: fill cheapest asks first. For sells: fill highest bids first.
+    reverse = (side == 'sell')
+    candidates = sorted(
+        [p for p in book if (p &lt;= price if side == 'buy' else p &gt;= price)],
+        reverse=reverse
+    )
+
+    remaining = qty
+    for candidate_price in candidates:
+        if remaining == 0:
+            break
+        filled = min(remaining, book[candidate_price])
+        book[candidate_price] -= filled
+        if book[candidate_price] == 0:
+            del book[candidate_price]
+        remaining -= filled
+
+    return qty - remaining  # total filled
+
+
+def match_order(self, side, price, qty):
+    book = self.asks if side == 'buy' else self.bids
+    if side == 'buy':
+        valid = [p for p in book if p &lt;= price]
+        return min(valid) if valid else None
+    else:
+        valid = [p for p in book if p &gt;= price]
+        return max(valid) if valid else None</pre>
+          <div class="sol-note">
+            <strong>Why sort asks ascending for a buy order?</strong> A buyer wants the cheapest available price first — best execution. Fill the lowest ask, then the next lowest, until the order is complete or no eligible prices remain.<br><br>
+            <strong>Why sort bids descending for a sell order?</strong> A seller wants the highest available price first.<br><br>
+            <strong>What is a partial fill?</strong> If the incoming order qty exceeds available liquidity at the best price, fill what's there and continue to the next price level. The book gets modified as you go.<br><br>
+            <strong>Edge cases to always mention:</strong>
+            <ul style="margin:6px 0 0;padding-left:18px;line-height:1.75;">
+              <li>Empty book (no candidates) → return 0 filled / <code>None</code> for match</li>
+              <li>Partial fill (not enough liquidity at eligible prices) → return what was filled</li>
+              <li>Exact fill (remaining hits 0 mid-loop) → break early</li>
+              <li>Modifying a dict while iterating it → collect <code>candidates</code> first, then modify (the solution above does this correctly)</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <details style="margin:18px 0;border:1px solid #e0e4ef;border-radius:10px;overflow:hidden;">
       <summary style="background:#f7f8fc;padding:14px 20px;font-size:1.05rem;border-radius:10px;">
         ⏭ Round 3 — Probability &amp; Options Pricing <span style="color:#5a6070;font-size:0.85rem;font-weight:400;">(click to expand)</span>
@@ -5211,6 +5346,68 @@ Weekly = Annual Vol / 16 × √5 ≈ Annual Vol / 7.1
 = 20% / 7.1 ≈ 2.8% per week → $11.20 on a $400 stock
       </div>
       <div class="tip" style="margin-top:8px;"><strong>The "16 rule" is a standard trading floor shortcut.</strong> √252 ≈ 16. Divide annual vol by 16 to get daily expected move. Every options trader knows this.</div>
+    </div>
+
+
+    <h4 style="margin-top:1.8rem;color:#0284c7;">Relative Value &amp; Time Decay — Get This Right</h4>
+    <p style="color:#5a6070;font-size:0.9rem;margin-bottom:14px;">Time value questions appear in Round 2 and Round 3. These are not hard calculations — they test whether you have the right intuition. Get the framing exactly right.</p>
+
+    <div class="card" style="border-top:3px solid #0284c7;">
+      <h4>Time Value and Relative Value</h4>
+      <p style="font-size:0.87rem;color:#475569;margin:4px 0 8px;">An option's price = <strong>Intrinsic Value + Time Value</strong></p>
+      <ul style="font-size:0.87rem;color:#475569;line-height:1.75;margin:0 0 10px;padding-left:20px;">
+        <li><strong>Intrinsic value</strong> = payoff if exercised right now: max(S − K, 0) for calls</li>
+        <li><strong>Time value</strong> = everything else — the extra you pay for the possibility the option moves further ITM before expiry</li>
+        <li>Time value is always ≥ 0. It decays to zero at expiry. This decay is called <strong>theta</strong>.</li>
+      </ul>
+
+      <div style="background:#eff6ff;border-left:4px solid #3b82f6;border-radius:0 8px 8px 0;padding:14px 16px;margin:10px 0;">
+        <p style="font-size:0.85rem;font-weight:700;color:#1d4ed8;margin:0 0 6px;">The relative value question (appeared in a real Maven Round 2):</p>
+        <p style="font-size:0.9rem;color:#1e293b;margin:0 0 8px;"><em>"An option expires at end of year. Is it worth more in 1 month's time or 3 months' time?"</em></p>
+        <p style="font-size:0.87rem;color:#334155;margin:0 0 6px;"><strong>Answer: 3 months' time.</strong> At 3 months from now, the option still has ~9 months to expiry — more time value remaining. At 1 month from now, it has ~11 months elapsed and only ~1 month left — far less time value. Time value decays as expiry approaches, so earlier in the option's life = more value.</p>
+        <p style="font-size:0.85rem;color:#475569;margin:0;"><strong>The intuition:</strong> The more time remaining, the more opportunity for the stock to move in your favor. Option buyers pay for that optionality. As time runs out, that optionality evaporates.</p>
+      </div>
+
+      <p style="font-size:0.87rem;color:#475569;margin:10px 0 6px;"><strong>Theta decay is non-linear — it accelerates as expiry approaches.</strong> An ATM option loses very little value per day with 6 months to go, but loses value rapidly in the final 2–3 weeks.</p>
+
+      <pre style="background:#1e293b;color:#e2e8f0;padding:14px 18px;border-radius:8px;font-size:0.82rem;line-height:1.6;overflow-x:auto;margin:8px 0;">Time Value
+    |
+    |\
+    | \
+    |  \
+    |   \___
+    |        \____
+    |_______________\___
+    6mo  3mo  1mo  1wk   Expiry</pre>
+    </div>
+
+    <div class="card" style="border-top:3px solid #7c3aed;">
+      <h4>Option Convexity (Gamma)</h4>
+      <p style="font-size:0.87rem;color:#475569;margin:4px 0 8px;">Convexity in options refers to the <strong>non-linear (curved) relationship</strong> between option price and the underlying price.</p>
+      <ul style="font-size:0.87rem;color:#475569;line-height:1.75;margin:0 0 10px;padding-left:20px;">
+        <li><strong>Delta</strong> = first-order sensitivity. How much does the option price move per $1 move in the stock? (linear approximation)</li>
+        <li><strong>Gamma</strong> = second-order sensitivity. How much does delta itself change per $1 move in the stock? This is the convexity.</li>
+      </ul>
+
+      <p style="font-size:0.87rem;color:#475569;margin:4px 0 6px;"><strong>Why convexity matters:</strong> A long option has a convex payoff profile — you benefit more from large moves than you lose from small moves. This is why options have positive expected value from volatility: the gains on big moves outweigh the losses on small moves, relative to a linear position.</p>
+
+      <ul style="font-size:0.87rem;color:#475569;line-height:1.75;margin:0 0 10px;padding-left:20px;">
+        <li><strong>Long options → positive gamma (convex)</strong> — delta increases as stock moves in your favor</li>
+        <li><strong>Short options → negative gamma (concave)</strong> — delta moves against you as stock moves</li>
+      </ul>
+
+      <div class="tip" style="margin:8px 0;"><strong>Practical intuition:</strong> If you're long a call with delta 0.5 and the stock rises $10, your delta might now be 0.7 (gamma pushed it up). You profited more than a simple delta estimate would suggest. That extra profit is the convexity benefit.</div>
+
+      <p style="font-size:0.87rem;color:#475569;margin:6px 0 4px;">Market makers who are <strong>long gamma</strong> want the stock to move — big moves in either direction make them money. Market makers who are <strong>short gamma</strong> fear movement — they need to keep re-hedging as delta shifts.</p>
+
+      <div style="background:#faf5ff;border-left:4px solid #7c3aed;border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;">
+        <p style="font-size:0.85rem;font-weight:700;color:#5b21b6;margin:0 0 6px;">Key relationship:</p>
+        <ul style="font-size:0.87rem;color:#334155;line-height:1.8;margin:0;padding-left:18px;">
+          <li>Long gamma = long convexity = you want volatility</li>
+          <li>Short gamma = short convexity = you want the stock to sit still</li>
+          <li>You pay for positive gamma through <strong>theta decay</strong> — the two are always in tension</li>
+        </ul>
+      </div>
     </div>
 
       </div>
